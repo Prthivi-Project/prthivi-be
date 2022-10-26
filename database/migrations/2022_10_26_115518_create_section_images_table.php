@@ -14,9 +14,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('landing_pages', function (Blueprint $table) {
+        Schema::create('section_images', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Section::class);
+            $table->foreignId("section_id")->constrained("sections")->cascadeOnDelete();
+            $table->string("image_url")->unique();
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('landing_pages');
+        Schema::dropIfExists('section_images');
     }
 };

@@ -10,14 +10,15 @@ class Section extends Model
     use HasFactory;
 
     protected $fillable = [
-        "images_id",
-        "number"
+        "number",
+        "section_title",
+        "section_description"
     ];
 
     // relational
     public function images()
     {
-        return $this->hasMany(Images::class);
+        return $this->hasMany(SectionImages::class);
     }
 
     public function landingPage()
