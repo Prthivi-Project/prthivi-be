@@ -3,10 +3,15 @@
 namespace App\Http\Controllers\Product;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Product\StoreProductRequest;
+use App\Models\Product;
+use App\Traits\ResponseFormatter;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    use ResponseFormatter;
+
     /**
      * Display a listing of the resource.
      *
@@ -23,10 +28,12 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        //
+        $validated = $request->validated();
+        $product = Product::create($validated);
 
+        return $this->success(201, "Product created", $product);
     }
 
     /**
