@@ -17,7 +17,11 @@ class StoreFactory extends Factory
     public function definition()
     {
         return [
-            //
+            "name" => $this->faker->name(),
+            "description" => $this->faker->paragraph(),
+            "address" => $this->faker->paragraph(),
+            "photo_url" => $this->faker->imageUrl(),
+            "map_location" => $this->faker->word(),
         ];
     }
 }

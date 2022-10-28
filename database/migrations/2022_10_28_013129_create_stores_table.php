@@ -16,10 +16,10 @@ return new class extends Migration
         Schema::create('stores', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->longText('description');
-            $table->string('address');
+            $table->longText('description')->nullable();
+            $table->string('address')->nullable();
             $table->string('photo_url');
-            $table->string('map_location');
+            $table->string('map_location')->nullable();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             // $table->
             $table->timestamps();
