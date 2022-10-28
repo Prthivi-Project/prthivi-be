@@ -29,6 +29,8 @@ class StoreProductRequest extends FormRequest
             "price" => ['required', 'numeric'],
             "available" => ["boolean"],
             "size" => ["string"],
+            'product_image' => ['nullable'],
+            'product_image.*' => ['image', 'mimes:png,jpg,webp'],
             "fabric_composition" => ["required", "string"]
         ];
     }
