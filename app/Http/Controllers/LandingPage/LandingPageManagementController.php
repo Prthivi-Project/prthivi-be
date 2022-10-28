@@ -28,7 +28,8 @@ class LandingPageManagementController extends Controller
 
     public function index()
     {
-        $data = Section::with("images")->get();
+        $data = Section::with("images")
+            ->get(["id", "section_title", "section_description", "number"]);
 
         if (!$data) {
             return $this->error(400, "Bad Request", null);
