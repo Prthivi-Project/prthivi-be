@@ -12,7 +12,10 @@ class Section extends Model
     protected $fillable = [
         "number",
         "section_title",
-        "section_description"
+        "section_description",
+        'button_link',
+        'button_name',
+
     ];
 
     // relational

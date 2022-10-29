@@ -29,6 +29,8 @@ class UpdateLandingPageRequest extends FormRequest
             "number" => "numeric",
             "section_title" => "string",
             "section_description" => "string",
+            'button_link' => 'url',
+            'button_name' => 'required_if:button_link,url|string|url'
         ];
     }
 }
