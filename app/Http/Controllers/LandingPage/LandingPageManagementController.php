@@ -63,7 +63,7 @@ class LandingPageManagementController extends Controller
                     return $this->error(500, "Error occur while uploading photo", null);
                 }
 
-                $imgArray[] = ["section_id" => $section->id, "image_url" => \asset($imagePath)];
+                $imgArray[] = ["section_id" => $section->id, "image_url" => \asset("storage/" . $imagePath)];
             }
 
             $section->images()->insert($imgArray);
