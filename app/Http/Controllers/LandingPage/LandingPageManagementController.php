@@ -47,12 +47,11 @@ class LandingPageManagementController extends Controller
     public function store(LandingPageManagementRequest $request)
     {
         $validated = $request->except("section_images");
-        $section = Section::create($validated);
         $imageFiles = $request->file("section_images", []);
 
-        if (!$section) {
-            return $this->error(500, "Error occur when creating new resource", $section);
-        }
+
+        $section = Section::create($validated);
+
         $this->checkAndCreateDirIfNotExist(self::$dirName);
 
         if ($request->hasFile("section_images")) {
@@ -60,7 +59,11 @@ class LandingPageManagementController extends Controller
             foreach ($imageFiles as $file) {
                 $imagePath = $this->storeMedia($file, self::$dirName);
                 if (!$imagePath) {
-                    return $this->error(500, "Error occur while uploading photo", null);
+                    return $this->error(
+                        500,
+                        "Error occur while uploading photo",
+                        "Error occur while uploading photo"
+                    );
                 }
 
                 $imgArray[] = ["section_id" => $section->id, "image_url" => \asset($imagePath)];
@@ -69,7 +72,11 @@ class LandingPageManagementController extends Controller
             $section->images()->insert($imgArray);
 
             if (!$section) {
-                return $this->error(500, "Error occur while creating new resource", null);
+                return $this->error(
+                    500,
+                    "Error occur while creating new resource",
+                    "Error occur while uploading photo"
+                );
             }
         }
 

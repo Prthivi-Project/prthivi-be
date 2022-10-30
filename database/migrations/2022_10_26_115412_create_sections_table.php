@@ -20,6 +20,8 @@ return new class extends Migration
             $table->integer("number");
             $table->string("section_title")->nullable();
             $table->string("section_description")->nullable();
+            $table->string("button_link")->nullable();
+            $table->string("button_name")->nullable();
             $table->timestamps();
         });
     }
