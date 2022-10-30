@@ -66,7 +66,7 @@ class LandingPageManagementController extends Controller
                     );
                 }
 
-                $imgArray[] = ["section_id" => $section->id, "image_url" => \asset($imagePath)];
+                $imgArray[] = ["section_id" => $section->id, "image_url" => \asset("storage/" . $imagePath)];
             }
 
             $section->images()->insert($imgArray);
