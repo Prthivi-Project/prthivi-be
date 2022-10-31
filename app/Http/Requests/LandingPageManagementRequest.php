@@ -29,8 +29,8 @@ class LandingPageManagementRequest extends FormRequest
             "number" => "numeric",
             "section_title" => "string",
             "section_description" => "string",
-            'button_link' => 'url',
-            'button_name' => 'required_if:button_link,url|string'
+            'button_link' => 'string',
+            'button_name' => 'required_if:button_link|string'
         ];
     }
 }
