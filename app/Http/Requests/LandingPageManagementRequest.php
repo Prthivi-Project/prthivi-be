@@ -25,7 +25,7 @@ class LandingPageManagementRequest extends FormRequest
     {
         return [
             "section_images" => "nullable",
-            "section_images.*" => "file|mimes:png,jpg,webp",
+            "section_images.*" => "file|mimes:png,jpg,webp|max:2096",
             "number" => "numeric",
             "section_title" => "string",
             "section_description" => "string",
