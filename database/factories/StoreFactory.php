@@ -19,7 +19,7 @@ class StoreFactory extends Factory
         return [
             "name" => $this->faker->name(),
             "description" => $this->faker->paragraph(),
-            "address" => $this->faker->paragraph(),
+            "address" => $this->faker->address(),
             "photo_url" => $this->faker->imageUrl(),
             "map_location" => $this->faker->word(),
         ];
