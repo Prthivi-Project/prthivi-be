@@ -30,6 +30,6 @@ class CategorySeeder extends Seeder
             ["name" => "SKIRTS", "created_at" => now(), "updated_at" => now()],
         ];
 
-        Category::factory()->create($data);
+        Category::factory()->createManyQuietly($data);
     }
 }
