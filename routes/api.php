@@ -3,6 +3,7 @@
 use App\Http\Controllers\LandingPage\LandingPageManagementController;
 use App\Http\Controllers\LandingPage\SectionImageController;
 use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Product\ProductImageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +33,7 @@ Route::group(["prefix" => "v1",], function () {
     });
 
     Route::group(["as" => "products.", "prefix" => "products"], function () {
+        Route::put("/images", [ProductImageController::class, 'update'])->name("images.update");
         Route::delete("/{id}", [ProductController::class, "destroy"])->name("destroy");
         Route::put("/{id}", [ProductController::class, "update"])->name("update");
         Route::post("/", [ProductController::class, "store"])->name("store");
