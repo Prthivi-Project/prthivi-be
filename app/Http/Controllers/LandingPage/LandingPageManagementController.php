@@ -115,7 +115,7 @@ class LandingPageManagementController extends Controller
         if ($request->hasFile("section_images")) {
             if (\count($section->images) > 0) {
                 foreach ($section->images as $file) {
-                    $filePath  = str_replace(\asset(""), "", $file->image_url);
+                    $filePath  = str_replace(\asset("storage"), "", $file->image_url);
                     $this->removeMedia($filePath);
                 }
 
@@ -129,7 +129,7 @@ class LandingPageManagementController extends Controller
                     return $this->error(500, "Error occur while uploading photo", null);
                 }
 
-                $imgArray[] = ["section_id" => $section->id, "image_url" => \asset($imagePath)];
+                $imgArray[] = ["section_id" => $section->id, "image_url" => \asset("storage/" . $imagePath)];
             }
             $section->images()->insert($imgArray);
         }
