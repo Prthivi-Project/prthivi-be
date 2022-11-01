@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use App\Traits\ResponseFormatter;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
@@ -50,6 +51,11 @@ class Handler extends ExceptionHandler
         $this->renderable(function (NotFoundHttpException $e, Request $request) {
             if ($request->is("api/*")) {
                 return $this->error(404, "NOT FOUND", $e->getMessage());
+            }
+        });
+        $this->renderable(function (ValidationException $e, Request $request) {
+            if ($request->is("api/*")) {
+                return $this->error(422, "Unproccessable Entities", $e->getMessage());
             }
         });
     }
