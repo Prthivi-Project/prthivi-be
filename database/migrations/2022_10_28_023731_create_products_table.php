@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string("name");
             $table->string("description");
             $table->unsignedDouble("price");
-            $table->boolean("available")->default(true);
+            $table->enum("status", ["available", "reserved"])->default("available");
             $table->string("size")->nullable();
             $table->string("fabric_composition");
             $table->foreignId("store_id")->constrained("stores")->onDelete("cascade");

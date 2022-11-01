@@ -13,7 +13,7 @@ class Product extends Model
         "name",
         "description",
         "price",
-        "available",
+        "status",
         "size",
         "store_id",
         "fabric_composition",

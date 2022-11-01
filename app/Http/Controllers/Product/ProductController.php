@@ -43,7 +43,7 @@ class ProductController extends Controller
             $product->where("available", $available);
         }
 
-        $product = $product->paginate($limit);
+        $product = $product->limit($limit)->get();
         return $this->success(
             200,
             "Getting data successfully",
@@ -92,7 +92,8 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        //
+        $data =  Product::with('store', "images")->findOrFail($id);
+        return $this->success(200, "OK", $data);
     }
 
     /**
