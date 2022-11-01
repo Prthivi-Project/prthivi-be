@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateLandingPageRequest;
 use App\Models\LandingPage\Images;
 use App\Models\LandingPage\Section;
 use App\Models\LandingPage\SectionImages;
+use App\Models\ProductImages;
 use App\Traits\MediaRemove;
 use App\Traits\MediaUpload;
 use App\Traits\ResponseFormatter;
@@ -108,7 +109,7 @@ class LandingPageManagementController extends Controller
         if (!$section) {
             return $this->error(404, "Not found", "No query result for section id $id");
         }
-        $validated = $request->only("number", "section_title", "section_description");
+        $validated = $request->except("section_images");
 
         $section->fill($validated);
 
@@ -129,7 +130,12 @@ class LandingPageManagementController extends Controller
                     return $this->error(500, "Error occur while uploading photo", null);
                 }
 
-                $imgArray[] = ["section_id" => $section->id, "image_url" => \asset("storage/" . $imagePath)];
+                $imgArray[] = [
+                    "section_id" => $section->id,
+                    "image_url" => \asset("storage/" . $imagePath),
+                    "created_at" => \now(),
+                    "updated_at" => now()
+                ];
             }
             $section->images()->insert($imgArray);
         }
@@ -138,7 +144,7 @@ class LandingPageManagementController extends Controller
         if (!$result) {
             return $this->error(500, "something went wrong", null);
         }
-        return $this->success(200, "UPDATED", $section->fresh());
+        return $this->success(200, "UPDATED", Section::with('images')->findOrFail($section->id));
     }
 
     /**
@@ -157,7 +163,7 @@ class LandingPageManagementController extends Controller
         // delete file image
         if (\count($section->images) > 0) {
             foreach ($section->images as $file) {
-                $filePath  = str_replace(\asset(""), "", $file->image_url);
+                $filePath  = str_replace(\asset("storage/"), "", $file->image_url);
                 $isRemoved = $this->removeMedia($filePath);
                 if (!$isRemoved) {
                     return $this->error(400, "Cannot remove file", null);
