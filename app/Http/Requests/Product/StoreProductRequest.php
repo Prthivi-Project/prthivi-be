@@ -27,11 +27,12 @@ class StoreProductRequest extends FormRequest
             'name' => ['required', 'string'],
             'description' => ['required', 'string'],
             "price" => ['required', 'numeric'],
-            "available" => ["boolean"],
+            "status" => ["string",  "in:available,reversed"],
             "size" => ["string"],
             'product_image' => ['nullable'],
             'product_image.*' => ['image', 'mimes:png,jpg,webp'],
-            "fabric_composition" => ["required", "string"]
+            "fabric_composition" => ["required", "string"],
+            "store_id" => ["required", "exists:stores,id"],
         ];
     }
 }
