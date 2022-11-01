@@ -42,6 +42,8 @@ Route::group(["prefix" => "v1",], function () {
     });
 
     Route::group(["as" => "store.", "prefix" => "stores"], function () {
+        Route::delete('/{id}', [StoreController::class, "destroy"])->name("delete");
+        Route::put('/{id}', [StoreController::class, "update"])->name("update");
         Route::post('/', [StoreController::class, "create"])->name("create");
         Route::get('/', [StoreController::class, "index"]);
     });
