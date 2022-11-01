@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Product;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Product\ProductUpdateRequest;
 use App\Http\Requests\Product\StoreProductRequest;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Traits\MediaUpload;
 use App\Traits\ResponseFormatter;
@@ -23,7 +25,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $id = $request->query("id");
-        $limit  = $request->query("limit") ?? 50;
+        $limit  = $request->query("limit") ?: 30;
         $name  = $request->query("name");
         $available  = $request->query("available");
 
@@ -35,7 +37,10 @@ class ProductController extends Controller
             return $this->success(200, "OK", $product);
         }
 
-        $product = Product::query()->with('images', 'store');
+        $product = Product::query()->with([
+            'images',
+            "store",
+        ]);
         if ($name) {
             $product->where("name", "LIKE", "%$name%");
         }
@@ -43,11 +48,11 @@ class ProductController extends Controller
             $product->where("available", $available);
         }
 
-        $product = $product->limit($limit)->get();
+        $product = $product->simplePaginate($limit);
         return $this->success(
             200,
             "Getting data successfully",
-            $product,
+            ProductResource::collection($product),
         );
     }
 
@@ -70,7 +75,7 @@ class ProductController extends Controller
 
                 $filePathArray[] = [
                     'product_id' => $product->id,
-                    'image_url' => \asset($filePath),
+                    'image_url' => \asset("storage/" . $filePath),
                 ];
             }
 
@@ -103,9 +108,12 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ProductUpdateRequest $request, $id)
     {
-        //
+        $product = Product::findOrFail($id);
+        $product->fill($request->except("product_image"))->saveOrFail();
+
+        return $this->success(200, "Update successfully", $product);
     }
 
     /**
@@ -116,6 +124,12 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $data = Product::findOrFail($id);
+
+        $data->delete();
+        if (!$data) {
+            return $this->error(400, "Error occur while deleting resource",  "Error occur while deleting resource");
+        }
+        return $this->success(200, "Delete successfully", null);
     }
 }
