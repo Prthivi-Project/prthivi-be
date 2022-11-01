@@ -83,11 +83,26 @@ class StoreController extends Controller
             $path = $this->storeMedia($file, self::$dirName);
             $store->fill([
                 "photo_url" => \asset("storage/$path")
-            ])->saveOrFail();
+            ]);
         }
 
         $store->saveOrFail();
 
-        return $this->success(200, "Update successfully", $store);
+        return $this->success(200, "Update successfully", $store->fresh());
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $store = Store::findOrFail($id);
+
+        $store->deleteOrFail();
+
+        return $this->success(200, "Delete successfully", null);
     }
 }
