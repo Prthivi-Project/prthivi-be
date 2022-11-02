@@ -94,21 +94,25 @@ class ProductController extends Controller
         if ($request->hasFile('product_images') || $request->product_images_base64) {
             $filePathArray = [];
 
-            foreach ($request->file('product_images', []) as $file) {
-                $filePath = $this->storeMediaAsFile($file, self::$dirName);
+            if ($request->hasFile("product_images")) {
+                foreach ($request->file('product_images', []) as $file) {
+                    $filePath = $this->storeMediaAsFile($file, self::$dirName);
 
-                $filePathArray[] = [
-                    'image_url' => \asset("storage/" . $filePath),
-                ];
+                    $filePathArray[] = [
+                        'image_url' => \asset("storage/" . $filePath),
+                    ];
+                }
+            }
+            if ($request->product_images_base64) {
+                foreach ($request->product_images_base64 as $key => $file) {
+                    $filePath = $this->storeMediaAsBased64($file, self::$dirName);
+
+                    $filePathArray[] = [
+                        'image_url' => \asset("storage/" . $filePath),
+                    ];
+                }
             }
 
-            foreach ($request->product_images_base64 as $key => $file) {
-                $filePath = $this->storeMediaAsBased64($file, self::$dirName);
-
-                $filePathArray[] = [
-                    'image_url' => \asset("storage/" . $filePath),
-                ];
-            }
 
             $res = $product->images()->createMany($filePathArray);
             if (!$res) {
