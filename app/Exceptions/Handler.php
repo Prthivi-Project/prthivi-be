@@ -55,7 +55,7 @@ class Handler extends ExceptionHandler
         });
         $this->renderable(function (ValidationException $e, Request $request) {
             if ($request->is("api/*")) {
-                return $this->error(422, "Unproccessable Entities", $e->getMessage());
+                return $this->error(422, "Unproccessable Entities", $e->errors());
             }
         });
     }
