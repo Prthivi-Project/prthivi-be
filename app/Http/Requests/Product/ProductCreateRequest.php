@@ -29,6 +29,8 @@ class ProductCreateRequest extends FormRequest
             "price" => ['required', 'numeric'],
             "status" => ["string",  "in:available,reserved"],
             "size" => ["string"],
+            'product_image_base64' => ['array'],
+            'product_image_base64.*' => ['base64image', 'base64mimes:png,jpg,webp', 'base64max:2098'],
             'product_image' => ['nullable'],
             'product_image.*' => ['image', 'mimes:png,jpg,webp'],
             "fabric_composition" => ["required", "string"],
