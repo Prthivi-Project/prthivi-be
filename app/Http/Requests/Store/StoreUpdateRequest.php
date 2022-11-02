@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Store;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateSectionImagesRequest extends FormRequest
+class StoreUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,12 @@ class UpdateSectionImagesRequest extends FormRequest
     public function rules()
     {
         return [
-            "section_id" => "numeric|exists:sections,id",
-            'section_images' => "image|mimes:png,jpg,webp",
-            'section_images_64base.*' => "base64image|base64mimes:png,jpg,webp|base64max:2096",
+            "name" => ["string", "alpha"],
+            "description" => ["string"],
+            "address" => ["string"],
+            "photo_url" => ["url"],
+            "store_image" => ["file", "mimes:png,jpg,webp"],
+            "map_location" => ["nullable", "string"],
         ];
     }
 }

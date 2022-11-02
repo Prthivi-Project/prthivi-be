@@ -13,8 +13,9 @@ class Product extends Model
         "name",
         "description",
         "price",
-        "available",
+        "status",
         "size",
+        "view_count",
         "store_id",
         "fabric_composition",
     ];

@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\LandingPage\LandingPageManagementController;
 use App\Http\Controllers\LandingPage\SectionImageController;
+use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Product\ProductImageController;
+use App\Http\Controllers\Store\StoreController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,5 +31,20 @@ Route::group(["prefix" => "v1",], function () {
         Route::post("/", [LandingPageManagementController::class, "store"])->name("store");
         Route::get("/", [LandingPageManagementController::class, "index"])->name("index");
         Route::put("/section-images/{sectionImages}", [SectionImageController::class, "update"])->name("section_images.update");
+    });
+
+    Route::group(["as" => "products.", "prefix" => "products"], function () {
+        Route::put("/images", [ProductImageController::class, 'update'])->name("images.update");
+        Route::delete("/{id}", [ProductController::class, "destroy"])->name("destroy");
+        Route::put("/{id}", [ProductController::class, "update"])->name("update");
+        Route::post("/", [ProductController::class, "store"])->name("store");
+        Route::get("/", [ProductController::class, "index"])->name("index");
+    });
+
+    Route::group(["as" => "store.", "prefix" => "stores"], function () {
+        Route::delete('/{id}', [StoreController::class, "destroy"])->name("delete");
+        Route::put('/{id}', [StoreController::class, "update"])->name("update");
+        Route::post('/', [StoreController::class, "create"])->name("create");
+        Route::get('/', [StoreController::class, "index"]);
     });
 });
