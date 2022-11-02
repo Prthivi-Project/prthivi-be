@@ -31,7 +31,7 @@ class ProductController extends Controller
         $name  = $request->query("name");
         $size  = $request->query("size");
         $status  = $request->query("status");
-        $orderBy = $request->query("orderBy");
+        $orderBy  = $request->query("orderBy");
 
         if ($id) {
             $product = Product::with("store", "images")->findOrFail($id);
@@ -46,7 +46,6 @@ class ProductController extends Controller
         if ($name) {
             $product->where("name", "LIKE", "%$name%");
         }
-
         if ($size) {
             $product->where("size", $size);
         }
