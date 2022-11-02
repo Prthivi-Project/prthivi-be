@@ -56,10 +56,15 @@ class LandingPageManagementController extends Controller
 
         $this->checkAndCreateDirIfNotExist(self::$dirName);
 
+        if ($request->section_images_64base) {
+            $filePath =  $this->storeMediaAsBased64($request->section_images_64base, self::$dirName);
+            $section->images()->create(['image_url' => asset("storage/" . $filePath)]);
+        }
+
         if ($request->hasFile("section_images")) {
             $imgArray = array();
             foreach ($imageFiles as $file) {
-                $imagePath = $this->storeMedia($file, self::$dirName);
+                $imagePath = $this->storeMediaAsFile($file, self::$dirName);
                 if (!$imagePath) {
                     return $this->error(
                         500,
