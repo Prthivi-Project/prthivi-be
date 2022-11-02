@@ -37,14 +37,15 @@ class ProductImageController extends Controller
         $filePath = $this->storeMedia($fileImage, self::$dirName);
         if (!$filePath) {
             return $this->error(
-                400,
+                500,
                 "Error while upload file",
                 "Error while upload file"
             );
         }
 
-        $image->fill(["image_url" => \asset("storage/$filePath")])
-            ->saveOrFail();
+        $image->image_url = \asset("storage/$filePath");
+
+        $image = $image->saveOrFail();
 
 
         return $this->success(200, "Update successfully", $image);

@@ -27,10 +27,10 @@ class ProductUpdateRequest extends FormRequest
             'name' => ['string'],
             'description' => ['string'],
             "price" => ['numeric'],
-            "status" => ["string",  "in:available,reversed"],
+            "status" => ["string",  "in:available,reserved"],
             "size" => ["string"],
-            // 'product_image' => ['nullable'],
-            // 'product_image.*' => ['image', 'mimes:png,jpg,webp'],
+            'product_image' => ['nullable'],
+            'product_image.*' => ['file', 'mimes:png,jpg,webp'],
             "fabric_composition" => ["string"],
             "store_id" => ["exists:stores,id"],
         ];
