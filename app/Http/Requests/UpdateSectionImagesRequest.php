@@ -25,7 +25,8 @@ class UpdateSectionImagesRequest extends FormRequest
     {
         return [
             "section_id" => "numeric|exists:sections,id",
-            'section_images' => "image|mimes:png,jpg,webp"
+            'section_images' => "image|mimes:png,jpg,webp",
+            'section_images_64base.*' => "base64image|base64mimes:png,jpg,webp|base64max:2096",
         ];
     }
 }

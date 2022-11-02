@@ -16,6 +16,8 @@ class SectionImageController extends Controller
     use MediaRemove;
     use ResponseFormatter;
 
+    private static $dirName = 'section';
+
     /**
      * Store a newly created resource in storage.
      *
@@ -47,26 +49,33 @@ class SectionImageController extends Controller
      */
     public function update(UpdateSectionImagesRequest $request, SectionImages $sectionImages)
     {
-        $sectionImages->fill($request->only("section_id"));
+        $base64image = $request->section_images_64base;
+        $hasImageFile = $request->hasFile("section_images");
+        $imagePath = '';
 
-        if ($request->hasFile("section_images")) {
+        if ($base64image || $hasImageFile) {
             if ($sectionImages->image_url !== null) {
                 $isDeleted = $this->removeMedia($sectionImages->image_url);
                 if (!$isDeleted) {
                     return $this->error(500, "Error occur while deleting file", null);
                 }
             }
-            $file = $request->file("section_images");
-            $imagePath = $this->storeMedia($file, "section");
 
-            if (!$imagePath) {
-                return $this->error(500, "Error occur while deleting file", null);
+            if ($request->hasFile("section_images")) {
+                $file = $request->file("section_images");
+                $imagePath = $this->storeMedia($file, self::$dirName);
+                if (!$imagePath) {
+                    return $this->error(500, "Error occur while deleting file", null);
+                }
+            } else if ($base64image) {
+                $imagePath = $this->storeMediaAsBased64($base64image, self::$dirName);
             }
 
-            return $imagePath;
-            $sectionImages->fill(["image_url" => \asset($imagePath)]);
+
+            $sectionImages->image_url = \asset('storage/' .  $imagePath);
         }
         $sectionImages->saveOrFail();
+
         return $this->success(200, "UPDATED", $sectionImages->fresh());
     }
 
