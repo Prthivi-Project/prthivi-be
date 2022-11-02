@@ -7,6 +7,7 @@ use App\Http\Requests\Product\ProductCreateRequest;
 use App\Http\Requests\Product\ProductUpdateRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Traits\MediaRemove;
 use App\Traits\MediaUpload;
 use App\Traits\ResponseFormatter;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ class ProductController extends Controller
 {
     use ResponseFormatter;
     use MediaUpload;
+    use MediaRemove;
 
     private static $dirName = "product";
     /**
@@ -97,12 +99,12 @@ class ProductController extends Controller
                 $filePath = $this->storeMedia($file, self::$dirName);
 
                 $filePathArray[] = [
-                    'product_id' => $product->id,
+                    // 'product_id' => $product->id,
                     'image_url' => \asset("storage/" . $filePath),
                 ];
             }
 
-            $product->images()->insert($filePathArray);
+            $product->images()->createMany($filePathArray);
         }
 
         if (!$product) {
@@ -133,8 +135,52 @@ class ProductController extends Controller
      */
     public function update(ProductUpdateRequest $request, $id)
     {
-        $product = Product::findOrFail($id);
-        $product->fill($request->except("product_image"))->saveOrFail();
+        $product = Product::withCount('images')->with("images")->findOrFail($id);
+        $product->fill($request->except("product_image"));
+
+        if ($request->hasFile('product_images')) {
+            if ($product->images) {
+                $product->images()->delete();
+
+                foreach ($product->images as $key => $image) {
+                    $isDeleted = $this->removeMedia(
+                        \str_replace(asset("storage/"), "", $image->image_url)
+                    );
+
+                    if (!$isDeleted) {
+                        return $this->error(
+                            500,
+                            "Internal server error",
+                            "Error occur while uploading new resource"
+                        );
+                    }
+                }
+                info("Sudah berhasil di hapsu");
+            }
+            $filePathArray = [];
+
+            foreach ($request->file('product_images', []) as $key => $file) {
+                $filePath = $this->storeMedia($file, self::$dirName);
+
+                if (!$filePath) {
+                    return $this->error(
+                        500,
+                        "Internal server error",
+                        "Error occur while uploading new resource"
+                    );
+                }
+
+                $filePathArray[] = [
+                    'product_id' => $product->id,
+                    'image_url' => \asset("storage/" . $filePath),
+                    'created_at' => \now(),
+                    "updated_at" => now()
+                ];
+            }
+            $product->images()->insert($filePathArray);
+        }
+
+        $product = Product::with("images")->findOrFail($product->id);
 
         return $this->success(200, "Update successfully", $product);
     }

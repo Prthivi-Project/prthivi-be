@@ -27,7 +27,7 @@ class ProductCreateRequest extends FormRequest
             'name' => ['required', 'string'],
             'description' => ['required', 'string'],
             "price" => ['required', 'numeric'],
-            "status" => ["string",  "in:available,reversed"],
+            "status" => ["string",  "in:available,reserved"],
             "size" => ["string"],
             'product_image' => ['nullable'],
             'product_image.*' => ['image', 'mimes:png,jpg,webp'],
