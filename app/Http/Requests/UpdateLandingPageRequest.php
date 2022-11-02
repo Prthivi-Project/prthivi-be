@@ -28,7 +28,7 @@ class UpdateLandingPageRequest extends FormRequest
             "section_images_64base.*" => "base64image|base64mimes:png,jpg,webp|base64max:2098",
             "section_images" => "nullable",
             "section_images.*" => "file|mimes:png,jpg,webp",
-            "number" => "numeric",
+            "number" => "numeric|unique:sections,number",
             "section_title" => "string",
             "section_description" => "string",
             'button_link' => 'string',
