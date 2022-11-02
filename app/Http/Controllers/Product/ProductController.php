@@ -89,17 +89,24 @@ class ProductController extends Controller
      */
     public function store(ProductCreateRequest $request)
     {
-        $validated = $request->except("product_images");
+        $validated = $request->except("product_images", "product_images_base64");
         $product = Product::create($validated);
 
-        if ($request->hasFile('product_images')) {
+        if ($request->hasFile('product_images') || $request->product_images_base64) {
             $filePathArray = [];
 
             foreach ($request->file('product_images', []) as $file) {
-                $filePath = $this->storeMedia($file, self::$dirName);
+                $filePath = $this->storeMediaAsFile($file, self::$dirName);
 
                 $filePathArray[] = [
-                    // 'product_id' => $product->id,
+                    'image_url' => \asset("storage/" . $filePath),
+                ];
+            }
+
+            foreach ($request->product_images_base64 as $key => $file) {
+                $filePath = $this->storeMediaAsBased64($file, self::$dirName);
+
+                $filePathArray[] = [
                     'image_url' => \asset("storage/" . $filePath),
                 ];
             }
