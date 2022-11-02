@@ -104,14 +104,15 @@ class ProductController extends Controller
                 ];
             }
 
-            $product->images()->createMany($filePathArray);
+            $res = $product->images()->createMany($filePathArray);
+            if (!$res) {
+                return $this->error(500, "Error occur while creating new resource", null);
+            }
         }
 
-        if (!$product) {
-            return $this->error(500, "Error occur while creating new resource", null);
-        }
 
-        return $this->success(201, "Product created", $product);
+
+        return $this->success(201, "Product created", $product->load("images"));
     }
 
     /**
