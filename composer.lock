@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "61d054dc67f1d365c72e2a9623feb244",
+    "content-hash": "0d9e164975d22c2fa87fe0d6a193f2da",
     "packages": [
         {
             "name": "brick/math",
@@ -61,6 +61,64 @@
                 }
             ],
             "time": "2022-08-10T22:54:19+00:00"
+        },
+        {
+            "name": "crazybooot/base64-validation",
+            "version": "1.0.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/crazybooot/base64-validation.git",
+                "reference": "e2bcde574e432b4a3a951cbf56727a5cc910b413"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/crazybooot/base64-validation/zipball/e2bcde574e432b4a3a951cbf56727a5cc910b413",
+                "reference": "e2bcde574e432b4a3a951cbf56727a5cc910b413",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^5.5|^6.0|^7.0|^8.0|^9.0",
+                "php": "^7.1|^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Crazybooot\\Base64Validation\\Providers\\ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "App\\": "app/",
+                    "Crazybooot\\Base64Validation\\": "/src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "crazybooot",
+                    "email": "crazybooot@gmail.com"
+                }
+            ],
+            "description": "Laravel validators for base64 encoded files",
+            "keywords": [
+                "base64",
+                "download",
+                "encoded",
+                "files",
+                "images",
+                "laravel",
+                "validation"
+            ],
+            "support": {
+                "issues": "https://github.com/crazybooot/base64-validation/issues",
+                "source": "https://github.com/crazybooot/base64-validation/tree/1.0.10"
+            },
+            "time": "2022-02-18T14:22:13+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
