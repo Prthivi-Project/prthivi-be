@@ -27,13 +27,12 @@ class ProductController extends Controller
         $id = $request->query("id");
         $limit  = $request->query("limit") ?: 30;
         $name  = $request->query("name");
-        $available  = $request->query("available");
+        $size  = $request->query("size");
+        $status  = $request->query("status");
+        $orderBy = $request->query("orderBy");
 
         if ($id) {
-            $product = Product::find($id);
-            if (!$product) {
-                return $this->error(404, "Product not found.", null);
-            }
+            $product = Product::with("store", "images")->findOrFail($id);
             return $this->success(200, "OK", $product);
         }
 
@@ -41,14 +40,38 @@ class ProductController extends Controller
             'images',
             "store",
         ]);
+
         if ($name) {
             $product->where("name", "LIKE", "%$name%");
         }
-        if ($available) {
-            $product->where("available", $available);
+
+        if ($size) {
+            $product->where("size", $size);
         }
 
-        $product = $product->simplePaginate($limit);
+        if ($status) {
+            $product->where("status", $status);
+        }
+
+        // order
+        $orderWith = "created_at";
+        $orderType = "desc";
+
+        switch ($orderBy) {
+            case 'newest':
+                $orderWith = 'created_at';
+                $orderType = 'desc';
+                break;
+
+            case 'most_viewed':
+                $orderWith = 'view_count';
+                $orderType = 'desc';
+                break;
+        }
+
+        $product = $product->orderBy($orderWith, $orderType)
+            ->simplePaginate($limit);
+
         return $this->success(
             200,
             "Getting data successfully",

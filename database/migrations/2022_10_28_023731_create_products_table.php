@@ -16,11 +16,12 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string("name");
-            $table->string("description");
+            $table->string("description")->nullable();
             $table->unsignedDouble("price");
-            $table->enum("status", ["available", "reserved"])->default("available");
+            $table->enum("status", ['available', 'reserved'])->default("available");
             $table->string("size")->nullable();
-            $table->string("fabric_composition");
+            $table->string("fabric_composition")->nullable();
+            $table->integer("view_count")->default(0);
             $table->foreignId("store_id")->constrained("stores")->onDelete("cascade");
             $table->timestamps();
         });
