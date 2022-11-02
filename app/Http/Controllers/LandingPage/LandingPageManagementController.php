@@ -78,6 +78,7 @@ class LandingPageManagementController extends Controller
 
             $section->images()->insert($imgArray);
 
+
             if (!$section) {
                 return $this->error(
                     500,
@@ -87,7 +88,7 @@ class LandingPageManagementController extends Controller
             }
         }
 
-        return $this->success(201, "CREATED", $section);
+        return $this->success(201, "CREATED", $section->load("images"));
     }
 
     /**
@@ -145,11 +146,9 @@ class LandingPageManagementController extends Controller
             $section->images()->insert($imgArray);
         }
 
-        $result = $section->save();
-        if (!$result) {
-            return $this->error(500, "something went wrong", null);
-        }
-        return $this->success(200, "UPDATED", Section::with('images')->findOrFail($section->id));
+        $section->saveOrFail();
+
+        return $this->success(200, "UPDATED", $section->load("images"));
     }
 
     /**
