@@ -32,5 +32,6 @@ class DatabaseSeeder extends Seeder
             )
             ->create();
         $this->call(CategorySeeder::class);
+        $this->call(RoleSeeder::class);
     }
 }
