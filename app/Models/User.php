@@ -70,4 +70,9 @@ class User extends Authenticatable implements JWTSubject
             'role' => $this->with('roles'),
         ];
     }
+
+    public function store()
+    {
+        return $this->hasMany(Store::class);
+    }
 }
