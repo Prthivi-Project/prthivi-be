@@ -47,6 +47,7 @@ Route::group(["prefix" => "v1",], function () {
         Route::put("/images", [ProductImageController::class, 'update'])->name("images.update");
         Route::delete("/{id}", [ProductController::class, "destroy"])->name("destroy");
         Route::put("/{id}", [ProductController::class, "update"])->name("update");
+        Route::get("/{id}", [ProductController::class, "show"])->name("show");
         Route::post("/", [ProductController::class, "store"])->name("store");
         Route::get("/", [ProductController::class, "index"])->name("index");
     });

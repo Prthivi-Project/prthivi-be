@@ -31,16 +31,26 @@ class ProductController extends Controller
         $name  = $request->query("name");
         $size  = $request->query("size");
         $status  = $request->query("status");
-        $orderBy  = $request->query("orderBy");
+        $color = $request->query("color");
+
+        $orderBy  = $request->query("orderBy") ?: "most_viewed";
 
         if ($id) {
-            $product = Product::with("store", "images")->findOrFail($id);
+            $product = Product::with(
+                "store",
+                "images",
+                "colors:color,hexa_code"
+            )->findOrFail($id);
+
+            $product->view_count++;
+            $product->save();
             return $this->success(200, "OK", $product);
         }
 
         $product = Product::query()->with([
             'images',
             "store",
+            "colors"
         ]);
 
         if ($name) {
@@ -53,6 +63,13 @@ class ProductController extends Controller
         if ($status) {
             $product->where("status", $status);
         }
+
+        if ($color) {
+            $product->withWhereHas('colors', function ($query) use ($color) {
+                $query->where('color', $color);
+            });
+        }
+
 
         // order
         $orderWith = "created_at";
@@ -76,7 +93,8 @@ class ProductController extends Controller
         return $this->success(
             200,
             "Getting data successfully",
-            ProductResource::collection($product),
+            $product
+            // ProductResource::collection($product),
         );
     }
 
@@ -133,7 +151,9 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $data =  Product::with('store', "images")->findOrFail($id);
+        $data =  Product::with('store', "images", "colors:color,hexa_code")->findOrFail($id);
+        $data->view_count++;
+        $data->saveOrFail();
         return $this->success(200, "OK", $data);
     }
 
