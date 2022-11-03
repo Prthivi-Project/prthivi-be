@@ -31,7 +31,9 @@ class DatabaseSeeder extends Seeder
                     ->count(100)
             )
             ->create();
+
         $this->call(CategorySeeder::class);
         $this->call(RoleSeeder::class);
+        $this->call(ColorSeeder::class);
     }
 }
