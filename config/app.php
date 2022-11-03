@@ -185,7 +185,7 @@ return [
         /*
          * Package Service Providers...
          */
-
+        PHPOpenSourceSaver\JWTAuth\Providers\LaravelServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
 
         /*
