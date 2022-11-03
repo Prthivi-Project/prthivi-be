@@ -25,6 +25,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(["prefix" => "v1",], function () {
     //
+
+    require __DIR__ . '/auth.php';
+
     Route::group(["as" => "landingpage.", "prefix" => "landing-page"], function () {
         Route::delete("/{id}", [LandingPageManagementController::class, "destroy"])->name("destroy");
         Route::put("/{id}", [LandingPageManagementController::class, "update"])->name("update");
