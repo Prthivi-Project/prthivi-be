@@ -17,7 +17,7 @@ class AuthenticateUserController extends Controller
     use ResponseFormatter;
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('jwt.verify', ['except' => ['login', 'register']]);
     }
     //
     public function login(LoginRequest $request)
