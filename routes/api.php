@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\LandingPage\LandingPageManagementController;
 use App\Http\Controllers\LandingPage\SectionImageController;
 use App\Http\Controllers\Product\ProductController;
@@ -25,12 +26,21 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(["prefix" => "v1",], function () {
     //
-    Route::group(["as" => "landingpage.", "prefix" => "landing-page"], function () {
+
+    require __DIR__ . '/auth.php';
+
+    Route::group(["as" => "landingpage.", "prefix" => "landing-page", 'middleware' => 'jwt.verify'], function () {
         Route::delete("/{id}", [LandingPageManagementController::class, "destroy"])->name("destroy");
+
         Route::put("/{id}", [LandingPageManagementController::class, "update"])->name("update");
+
         Route::post("/", [LandingPageManagementController::class, "store"])->name("store");
-        Route::get("/", [LandingPageManagementController::class, "index"])->name("index");
-        Route::put("/section-images/{sectionImages}", [SectionImageController::class, "update"])->name("section_images.update");
+
+        Route::get("/", [LandingPageManagementController::class, "index"])
+            ->withoutMiddleware('jwt.verify')
+            ->name("index");
+        Route::put("/section-images/{sectionImages}", [SectionImageController::class, "update"])
+            ->name("section_images.update");
     });
 
     Route::group(["as" => "products.", "prefix" => "products"], function () {
@@ -46,5 +56,11 @@ Route::group(["prefix" => "v1",], function () {
         Route::put('/{id}', [StoreController::class, "update"])->name("update");
         Route::post('/', [StoreController::class, "create"])->name("create");
         Route::get('/', [StoreController::class, "index"]);
+    });
+
+    Route::group(["as" => "user.", "prefix" => "users", 'middleware' => 'jwt.verify'], function () {
+        Route::group(["as" => 'roles.', 'prefix' => 'roles'], function () {
+            Route::post('/', [RoleController::class, 'store'])->name("store");
+        });
     });
 });

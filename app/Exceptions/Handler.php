@@ -3,10 +3,16 @@
 namespace App\Exceptions;
 
 use App\Traits\ResponseFormatter;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
+use PDO;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -48,14 +54,19 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->renderable(function (NotFoundHttpException $e, Request $request) {
+        $this->renderable(function (Throwable $th, Request $request) {
             if ($request->is("api/*")) {
-                return $this->error(404, "NOT FOUND", $e->getMessage());
-            }
-        });
-        $this->renderable(function (ValidationException $e, Request $request) {
-            if ($request->is("api/*")) {
-                return $this->error(422, "Unproccessable Entities", $e->errors());
+                if ($th instanceof ValidationException) {
+                    return $this->error(422, $th->getMessage(), $th->errors());
+                } elseif ($th instanceof NotFoundHttpException) {
+                    return $this->error(Response::HTTP_NOT_FOUND, "NOT FOUND", $th->getMessage());
+                } elseif ($th instanceof UnauthorizedHttpException) {
+                    return $this->error(Response::HTTP_UNAUTHORIZED, "Unauthorized", $th->getMessage());
+                } elseif ($th instanceof BadRequestHttpException) {
+                    return $this->error(Response::HTTP_BAD_REQUEST, "Bad Request", $th->getMessage());
+                } elseif ($th instanceof AccessDeniedHttpException) {
+                    return $this->error(Response::HTTP_FORBIDDEN, "Forbidden", $th->getMessage());
+                }
             }
         });
     }

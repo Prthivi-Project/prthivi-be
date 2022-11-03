@@ -185,7 +185,7 @@ return [
         /*
          * Package Service Providers...
          */
-
+        PHPOpenSourceSaver\JWTAuth\Providers\LaravelServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
 
         /*
@@ -212,7 +212,9 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
-        'Image' => Intervention\Image\Facades\Image::class
+        'Image' => Intervention\Image\Facades\Image::class,
+        "JWTAuth" => PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth::class,
+        "JWTFactory" => PHPOpenSourceSaver\JWTAuth\Facades\JWTFactory::class,
     ])->toArray(),
 
 ];
