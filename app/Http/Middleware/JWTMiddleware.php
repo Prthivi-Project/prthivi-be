@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use App\Exceptions\AuthException;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Validation\UnauthorizedException;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenBlacklistedException;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException;
@@ -32,7 +31,7 @@ class JWTMiddleware
             //throw $th;
             if ($th instanceof TokenInvalidException) {
                 throw new AccessDeniedHttpException($th->getMessage());
-            } else if ($th instanceof TokenInvalidException) {
+            } else if ($th instanceof TokenExpiredException) {
                 throw new UnauthorizedHttpException($th->getMessage());
             } else if ($th instanceof TokenBlacklistedException) {
                 throw new BadRequestHttpException($th->getMessage());
