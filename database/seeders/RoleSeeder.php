@@ -21,13 +21,14 @@ class RoleSeeder extends Seeder
                 ["role" => "super_admin",],
                 ["role" => "admin"],
                 ["role" => "vendor"],
-                ["role" => "user"],
+                ["role" => "customer"],
             ]
         );
         $users = User::all();
         foreach ($users as $key => $user) {
             $i = \rand(0, count($roles) - 1);
-            $user->roles()->attach($roles[$i]);
+            // $user->roles()->attach($roles[$i]);
+            $user->roles()->associate($roles[$i])->save();
         }
     }
 }

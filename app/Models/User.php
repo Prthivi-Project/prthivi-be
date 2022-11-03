@@ -21,6 +21,8 @@ class User extends Authenticatable implements JWTSubject
     protected $fillable = [
         'name',
         'email',
+        "phone",
+        "avatar",
         'password',
     ];
 
@@ -47,7 +49,8 @@ class User extends Authenticatable implements JWTSubject
     // relational
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'user_roles', "user_id", "role_id");
+        return $this->belongsTo(Role::class, 'role_id');
+        // return $this->belongsToMany(Role::class, 'user_roles', "user_id", "role_id");
     }
 
 
@@ -63,6 +66,8 @@ class User extends Authenticatable implements JWTSubject
      */
     public function getJWTCustomClaims()
     {
-        return [];
+        return [
+            'role' => $this->with('roles'),
+        ];
     }
 }
