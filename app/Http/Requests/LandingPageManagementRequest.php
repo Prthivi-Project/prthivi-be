@@ -24,7 +24,7 @@ class LandingPageManagementRequest extends FormRequest
     public function rules()
     {
         return [
-            "section_images_64base" => "base64image|base64mimes:png,jpg,webp|base64max:2098",
+            "section_images_64base.*" => "base64image|base64mimes:png,jpg,webp|base64max:2098",
             "section_images" => "nullable",
             "section_images.*" => "file|mimes:png,jpg,webp|max:2096",
             "number" => "numeric|unique:sections,number",

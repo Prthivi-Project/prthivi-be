@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateSectionImagesRequest extends FormRequest
+class CreateSectionImagesRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +13,7 @@ class UpdateSectionImagesRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return false;
     }
 
     /**
@@ -24,9 +24,10 @@ class UpdateSectionImagesRequest extends FormRequest
     public function rules()
     {
         return [
-            "section_id" => "numeric|exists:sections,id",
-            'section_images' => "image|mimes:png,jpg,webp",
-            'section_images_64base' => "string|base64image|base64mimes:png,jpg,webp|base64max:2096",
+            'section_id' => "required|numeric|exists:sections,id",
+            'section_images' => "required_if:section_images_64base,null|image|mimes:png,jpg,webp",
+            'section_images_64base' => "required_if:section_images,null|string|base64image|base64mimes:png,jpg,webp|base64max:2096",
+
         ];
     }
 }

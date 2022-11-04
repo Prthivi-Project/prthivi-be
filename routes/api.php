@@ -39,8 +39,15 @@ Route::group(["prefix" => "v1",], function () {
         Route::get("/", [LandingPageManagementController::class, "index"])
             ->withoutMiddleware('jwt.verify')
             ->name("index");
-        Route::put("/section-images/{sectionImages}", [SectionImageController::class, "update"])
-            ->name("section_images.update");
+
+        Route::as('section_images')->prefix('section-images')->group(function () {
+            Route::delete("/{id}", [SectionImageController::class, "destroy"])
+                ->name("delete");
+            Route::put("/{id}", [SectionImageController::class, "update"])
+                ->name("update");
+            Route::post("/", [SectionImageController::class, "store"])
+                ->name("store");
+        });
     });
 
     Route::group(["as" => "products.", "prefix" => "products"], function () {
