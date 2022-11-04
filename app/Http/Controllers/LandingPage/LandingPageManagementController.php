@@ -57,8 +57,13 @@ class LandingPageManagementController extends Controller
         $this->checkAndCreateDirIfNotExist(self::$dirName);
 
         if ($request->section_images_64base) {
-            $filePath =  $this->storeMediaAsBased64($request->section_images_64base, self::$dirName);
-            $section->images()->create(['image_url' => asset("storage/" . $filePath)]);
+            $imageArr = array();
+            foreach ($request->section_images_64base as $key => $file) {
+                $filePath =  $this->storeMediaAsBased64($file, self::$dirName);
+                $imageArr[] = ['image_url' => asset("storage/" . $filePath)];
+            }
+
+            $section->images()->createMany($imageArr);
         }
 
         if ($request->hasFile("section_images")) {
@@ -73,10 +78,10 @@ class LandingPageManagementController extends Controller
                     );
                 }
 
-                $imgArray[] = ["section_id" => $section->id, "image_url" => \asset("storage/" . $imagePath)];
+                $imgArray[] = ["image_url" => \asset("storage/" . $imagePath)];
             }
 
-            $section->images()->insert($imgArray);
+            $section->images()->createMany($imgArray);
 
 
             if (!$section) {
