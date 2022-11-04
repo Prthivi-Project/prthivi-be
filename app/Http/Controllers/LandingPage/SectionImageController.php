@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\LandingPage;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreateSectionImagesRequest;
 use App\Http\Requests\UpdateSectionImagesRequest;
+use App\Models\LandingPage\Section;
 use App\Models\LandingPage\SectionImages;
 use App\Traits\MediaRemove;
 use App\Traits\MediaUpload;
@@ -24,9 +26,34 @@ class SectionImageController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateSectionImagesRequest $request)
     {
-        //
+        $sectionImages = new SectionImages([
+            "section_id" => $request->section_id
+        ]);
+
+        $base64image = $request->section_images_64base;
+        $hasImageFile = $request->hasFile("section_images");
+        $imagePath = '';
+
+        if ($base64image || $hasImageFile) {
+
+            if ($request->hasFile("section_images")) {
+                $file = $request->file("section_images");
+                $imagePath = $this->storeMediaAsFile($file, self::$dirName);
+                if (!$imagePath) {
+                    return $this->error(500, "Error occur while deleting file", null);
+                }
+            } else if ($base64image) {
+                $imagePath = $this->storeMediaAsBased64($base64image, self::$dirName);
+            }
+
+
+            $sectionImages->image_url = \asset('storage/' .  $imagePath);
+        }
+        $sectionImages->saveOrFail();
+
+        return $this->success(200, "UPDATED", $sectionImages->fresh());
     }
 
     /**
@@ -47,15 +74,19 @@ class SectionImageController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateSectionImagesRequest $request, SectionImages $sectionImages)
+    public function update(UpdateSectionImagesRequest $request, $id)
     {
+        $sectionImages = SectionImages::findOrFail($id);
         $base64image = $request->section_images_64base;
         $hasImageFile = $request->hasFile("section_images");
         $imagePath = '';
 
         if ($base64image || $hasImageFile) {
             if ($sectionImages->image_url !== null) {
-                $isDeleted = $this->removeMedia($sectionImages->image_url);
+                $filePath  = str_replace(\asset("storage"), "", $sectionImages->image_url);
+                $isDeleted = $this->removeMedia($filePath);
+
+
                 if (!$isDeleted) {
                     return $this->error(500, "Error occur while deleting file", null);
                 }
@@ -63,7 +94,7 @@ class SectionImageController extends Controller
 
             if ($request->hasFile("section_images")) {
                 $file = $request->file("section_images");
-                $imagePath = $this->storeMedia($file, self::$dirName);
+                $imagePath = $this->storeMediaAsFile($file, self::$dirName);
                 if (!$imagePath) {
                     return $this->error(500, "Error occur while deleting file", null);
                 }
@@ -87,6 +118,20 @@ class SectionImageController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $sectionImages = SectionImages::findOrFail($id);
+        if ($sectionImages->image_url !== null) {
+            $filePath  = str_replace(\asset("storage"), "", $sectionImages->image_url);
+            $isDeleted = $this->removeMedia($filePath);
+
+
+            if (!$isDeleted) {
+                return $this->error(500, "Error occur while deleting file", null);
+            }
+        }
+
+
+        $sectionImages->deleteOrFail();
+
+        return $this->error(200, "Deleted", null);
     }
 }
