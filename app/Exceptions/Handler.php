@@ -59,7 +59,7 @@ class Handler extends ExceptionHandler
                 if ($th instanceof ValidationException) {
                     return $this->error(422, $th->getMessage(), $th->errors());
                 } elseif ($th instanceof NotFoundHttpException) {
-                    return $this->error(Response::HTTP_NOT_FOUND, "NOT FOUND", $th->getMessage());
+                    return $this->error(Response::HTTP_NOT_FOUND, "NOT FOUND", "Resource not found in our record");
                 } elseif ($th instanceof UnauthorizedHttpException) {
                     return $this->error(Response::HTTP_UNAUTHORIZED, "Unauthorized", $th->getMessage());
                 } elseif ($th instanceof BadRequestHttpException) {
