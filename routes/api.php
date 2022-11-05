@@ -43,20 +43,20 @@ Route::group(["prefix" => "v1",], function () {
             ->name("section_images.update");
     });
 
-    Route::group(["as" => "products.", "prefix" => "products"], function () {
+    Route::group(["as" => "products.", "prefix" => "products", 'middleware' => 'jwt.verify'], function () {
         Route::put("/images", [ProductImageController::class, 'update'])->name("images.update");
         Route::delete("/{id}", [ProductController::class, "destroy"])->name("destroy");
         Route::put("/{id}", [ProductController::class, "update"])->name("update");
-        Route::get("/{id}", [ProductController::class, "show"])->name("show");
+        Route::get("/{id}", [ProductController::class, "show"])->name("show")->withoutMiddleware('jwt.verify');
         Route::post("/", [ProductController::class, "store"])->name("store");
-        Route::get("/", [ProductController::class, "index"])->name("index");
+        Route::get("/", [ProductController::class, "index"])->name("index")->withoutMiddleware('jwt.verify');
     });
 
-    Route::group(["as" => "store.", "prefix" => "stores"], function () {
-        Route::delete('/{id}', [StoreController::class, "destroy"])->name("delete");
-        Route::put('/{id}', [StoreController::class, "update"])->name("update");
+    Route::group(["as" => "store.", "prefix" => "stores", 'middleware' => 'jwt.verify'], function () {
+        Route::put('/{slug}', [StoreController::class, "update"])->name("update");
+        Route::delete('/{slug}', [StoreController::class, "destroy"])->name("delete");
         Route::post('/', [StoreController::class, "create"])->name("create");
-        Route::get('/', [StoreController::class, "index"]);
+        Route::get('/', [StoreController::class, "index"])->withoutMiddleware('jwt.verify');
     });
 
     Route::group(["as" => "user.", "prefix" => "users", 'middleware' => 'jwt.verify'], function () {
