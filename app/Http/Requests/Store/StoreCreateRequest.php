@@ -30,7 +30,6 @@ class StoreCreateRequest extends FormRequest
             "photo_url" => ["url", "required_if:store_image,file"],
             "store_image" => ["required_if:photo_url,url", "file", "mimes:png,jpg,webp"],
             "map_location" => ["nullable", "string"],
-            "user_id" => ["required", "exists:users,id"],
         ];
     }
 }
