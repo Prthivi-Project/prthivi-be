@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Product;
 
+use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class ProductCreateRequest extends FormRequest
 {
@@ -13,7 +15,7 @@ class ProductCreateRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return Gate::authorize('create', Product::class);
     }
 
     /**
@@ -27,14 +29,15 @@ class ProductCreateRequest extends FormRequest
             'name' => ['required', 'string'],
             'description' => ['required', 'string'],
             "price" => ['required', 'numeric'],
-            "status" => ["string",  "in:available,reserved"],
+            "status" => ['required', "string",  "in:available,reserved"],
             "size" => ["string"],
-            'product_image_base64' => ['array'],
-            'product_image_base64.*' => ['base64image', 'base64mimes:png,jpg,webp', 'base64max:2098'],
+            "fabric_composition" => ["required", "string"],
             'product_image' => ['nullable'],
             'product_image.*' => ['image', 'mimes:png,jpg,webp'],
-            "fabric_composition" => ["required", "string"],
-            "store_id" => ["required", "exists:stores,id"],
+            'product_image_base64' => ['nullable'],
+            'product_image_base64.*.image' => ["required_if:product_image_base64,array", 'base64image'],
+            'product_image_base64.*.color_id' => ['numeric', 'exists:colors,id'],
+            'product_image_base64.*.priority_level' => ['numeric'],
         ];
     }
 }

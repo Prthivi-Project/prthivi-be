@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\StoreCreateRequest;
 use App\Http\Requests\Store\StoreUpdateRequest;
 use App\Models\Store;
+use App\Models\User;
 use App\Traits\MediaRemove;
 use App\Traits\MediaUpload;
 use App\Traits\ResponseFormatter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class StoreController extends Controller
 {
@@ -28,7 +30,9 @@ class StoreController extends Controller
             $store = Store::with("products")->findOrFail($id);
             return $this->success(200, "OK", $store);
         }
-        $store = Store::query()->with("products");
+        $store = Store::query()->withCount("products")->with(['products' => function ($query) {
+            $query->with('images')->orderBy('view_count', 'desc')->limit(10);
+        }]);
 
         if ($name) {
             $store->where("name", "LIKE", "%" . $name . "%");
@@ -47,7 +51,11 @@ class StoreController extends Controller
      */
     public function create(StoreCreateRequest $request)
     {
-        $validated = $request->except("store_image");
+        $this->authorize('create', Store::class);
+
+        $validated = $request->safe()->except("store_image");
+        $validated['user_id'] = $request->user()->id;
+        $validated['slug'] = Str::slug($request->name . " " . Str::random(3));
         $store = Store::create($validated);
         if (!$store) {
             return $this->error(400, "Error occur while creating new resource", null);
@@ -55,10 +63,20 @@ class StoreController extends Controller
 
         if ($request->hasFile("store_image")) {
             $file = $request->file("store_image");
-            $path = $this->storeMedia($file, self::$dirName);
+            $path = $this->storeMediaAsFile($file, self::$dirName);
             $store->fill([
                 "photo_url" => \asset("storage/$path")
             ])->saveOrFail();
+        }
+
+        $user = User::withWhereHas('store', function ($query) use ($store) {
+            $query->where('id', $store->id);
+        })->update([
+            'role_id' => 3
+        ]);
+
+        if (!$user) {
+            return $this->error(400, "Error occur while update role", null);
         }
 
         return $this->success(201, "Product created", $store);
@@ -73,14 +91,15 @@ class StoreController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(StoreUpdateRequest $request, $id)
+    public function update(StoreUpdateRequest $request, $slug)
     {
-        $store = Store::findOrFail($id);
+        $store = Store::where('slug', $slug)->firstOrFail();
+        $this->authorize('update', $store);
 
-        $store->fill($request->except("store_image"));
+        $store->fill($request->safe()->except("store_image"));
         if ($request->hasFile("store_image")) {
             $file = $request->file("store_image");
-            $path = $this->storeMedia($file, self::$dirName);
+            $path = $this->storeMediaAsFile($file, self::$dirName);
             $store->fill([
                 "photo_url" => \asset("storage/$path")
             ]);
@@ -97,10 +116,10 @@ class StoreController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($slug)
     {
-        $store = Store::findOrFail($id);
-
+        $store = Store::where('slug', $slug)->firstOrFail();
+        $this->authorize('delete', $store);
         $store->deleteOrFail();
 
         return $this->success(200, "Delete successfully", null);

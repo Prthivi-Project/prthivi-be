@@ -30,5 +30,10 @@ class UserSeeder extends Seeder
             "password" => Hash::make('password'),
             'role_id' => 1 # super admin
         ]);
+
+        $role = Role::where("role", 'customer')->first();
+        $users = User::factory(20)->create();
+
+        $role->users()->saveMany($users);
     }
 }

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->longText('description')->nullable();
             $table->string('address')->nullable();
             $table->string('photo_url')->nullable();
+            $table->string('slug')->unique();
             $table->string('map_location')->nullable();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             // $table->

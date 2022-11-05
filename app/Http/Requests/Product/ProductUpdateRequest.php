@@ -31,8 +31,12 @@ class ProductUpdateRequest extends FormRequest
             "size" => ["string"],
             'product_image' => ['nullable'],
             'product_image.*' => ['file', 'mimes:png,jpg,webp'],
+            'product_image_base64' => ['nullable'],
+            'product_image_base64.*.image' => ["required_if:product_image_base64,array", 'base64image'],
+            'product_image_base64.*.color_id' => ['numeric', 'exists:colors,id'],
+            'product_image_base64.*.priority_level' => ['numeric'],
             "fabric_composition" => ["string"],
-            "store_id" => ["exists:stores,id"],
+            // "store_id" => ["exists:stores,id"],
         ];
     }
 }

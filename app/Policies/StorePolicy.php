@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Role;
+use App\Models\Store;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class RolePolicy
+class StorePolicy
 {
     use HandlesAuthorization;
 
@@ -25,10 +25,10 @@ class RolePolicy
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Role  $role
+     * @param  \App\Models\Store  $store
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, Role $role)
+    public function view(User $user, Store $store)
     {
         //
     }
@@ -41,56 +41,55 @@ class RolePolicy
      */
     public function create(User $user)
     {
-        return \in_array($user->role_id, [1, 2]);
+        return $user->role_id === 4 && $user->loadCount('store')->store_count === 0 && $user->hasVerifiedEmail();
     }
 
     /**
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Role  $role
+     * @param  \App\Models\Store  $store
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Role $role)
+    public function update(User $user, Store $store)
     {
-        //
-        return \in_array($user->role_id, [1, 2]);
+        return  $user->role_id === 3 && $user->id === $store->user_id;
     }
 
     /**
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Role  $role
+     * @param  \App\Models\Store  $store
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Role $role)
+    public function delete(User $user, Store $store)
     {
-        return \in_array($user->role_id, [1, 2]) && !(in_array($role->id, [1, 2]));
+        return  $user->role_id === 3 && $user->id === $store->user_id;
     }
 
     /**
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Role  $role
+     * @param  \App\Models\Store  $store
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, Role $role)
+    public function restore(User $user, Store $store)
     {
-        //
-        return \in_array($user->role_id, [1, 2]);
+        return  in_array($user->role_id, [1, 2]);
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Role  $role
+     * @param  \App\Models\Store  $store
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, Role $role)
+    public function forceDelete(User $user, Store $store)
     {
-        return \in_array($user->role_id, [1, 2]) && !(in_array($role->id, [1, 2]));
+        //
+        return  in_array($user->role_id, [1, 2]);
     }
 }
