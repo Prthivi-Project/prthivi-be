@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\LandingPage\SectionImages;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class UpdateSectionImagesRequest extends FormRequest
 {
@@ -13,7 +15,7 @@ class UpdateSectionImagesRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return Gate::authorize('update', SectionImages::class);
     }
 
     /**

@@ -29,32 +29,36 @@ Route::group(["prefix" => "v1",], function () {
 
     require __DIR__ . '/auth.php';
 
-    Route::group(["as" => "landingpage.", "prefix" => "landing-page", 'middleware' => 'jwt.verify'], function () {
-        Route::delete("/{id}", [LandingPageManagementController::class, "destroy"])
-            ->can('delete')
-            ->name("destroy");
-
-        Route::put("/{id}", [LandingPageManagementController::class, "update"])
-            ->can('update')
-            ->name("update");
-
-        Route::post("/", [LandingPageManagementController::class, "store"])
-            ->can('create', App\Models\LandingPage\Section::class)
-            ->name("store");
-
-        Route::get("/", [LandingPageManagementController::class, "index"])
-            ->withoutMiddleware('jwt.verify')
-            ->name("index");
-
+    Route::group([
+        "as" => "landingpage.",
+        "prefix" => "landing-page",
+        'middleware' => 'jwt.verify'
+    ], function () {
         Route::as('section_images')->prefix('section-images')->group(function () {
             Route::delete("/{id}", [SectionImageController::class, "destroy"])
-                ->can('update')
                 ->name("delete");
             Route::put("/{id}", [SectionImageController::class, "update"])
                 ->name("update");
             Route::post("/", [SectionImageController::class, "store"])
                 ->name("store");
         });
+
+        Route::delete("/{id}", [LandingPageManagementController::class, "destroy"])
+            ->name("destroy");
+
+        Route::put("/{id}", [LandingPageManagementController::class, "update"])
+            ->name("update");
+
+        Route::get("/{id}", [LandingPageManagementController::class, "show"])
+            ->withoutMiddleware('jwt.verify')
+            ->name("show");
+
+        Route::post("/", [LandingPageManagementController::class, "store"])
+            ->name("store");
+
+        Route::get("/", [LandingPageManagementController::class, "index"])
+            ->withoutMiddleware('jwt.verify')
+            ->name("index");
     });
 
     Route::group(["as" => "products.", "prefix" => "products", 'middleware' => 'jwt.verify'], function () {

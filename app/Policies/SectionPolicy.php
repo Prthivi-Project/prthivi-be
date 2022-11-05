@@ -51,7 +51,7 @@ class SectionPolicy
      * @param  \App\Models\Section  $section
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Section $section)
+    public function update(User $user)
     {
         return $user->isSuperAdministrator() || $user->isAdministrator();
     }
@@ -63,7 +63,7 @@ class SectionPolicy
      * @param  \App\Models\Section  $section
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Section $section)
+    public function delete(User $user)
     {
         return $user->isSuperAdministrator() || $user->isAdministrator();
     }

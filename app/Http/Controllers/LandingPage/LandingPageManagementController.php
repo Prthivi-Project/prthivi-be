@@ -104,7 +104,8 @@ class LandingPageManagementController extends Controller
      */
     public function show($id)
     {
-        //
+        $section = Section::with('images')->findOrFail($id);
+        return $this->success(200, "OK", $section);
     }
 
     /**
@@ -178,7 +179,8 @@ class LandingPageManagementController extends Controller
      */
     public function destroy($id)
     {
-        $section = Section::with("images")->find($id);
+        $this->authorize('delete', Section::class);
+        $section = Section::with("images")->findOrFail($id);
         if (!$section) {
             return $this->error(404, "Not found", "No query result for section id $id");
         }
