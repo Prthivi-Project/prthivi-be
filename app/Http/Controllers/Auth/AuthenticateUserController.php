@@ -15,10 +15,7 @@ use Illuminate\Validation\ValidationException;
 class AuthenticateUserController extends Controller
 {
     use ResponseFormatter;
-    public function __construct()
-    {
-        $this->middleware('jwt.verify', ['except' => ['login', 'register']]);
-    }
+
     //
     public function login(LoginRequest $request)
     {
@@ -43,7 +40,7 @@ class AuthenticateUserController extends Controller
     public function refresh()
     {
         return $this->success(200, "Refresh has been successfully", [
-            'user' => Auth::user(),
+            'user' => Auth::guard("api")->user(),
             'authorisation' => [
                 'token' => Auth::refresh(),
                 'type' => 'bearer',
