@@ -41,7 +41,7 @@ class StorePolicy
      */
     public function create(User $user)
     {
-        return $user->role_id === 4 && $user->loadCount('store')->store_count === 0 && $user->hasVerifiedEmail();
+        return $user->isCustomer() && $user->loadCount('store')->store_count === 0 && $user->hasVerifiedEmail();
     }
 
     /**
@@ -53,7 +53,7 @@ class StorePolicy
      */
     public function update(User $user, Store $store)
     {
-        return  $user->role_id === 3 && $user->id === $store->user_id;
+        return  $user->isVendor() && $user->id === $store->user_id;
     }
 
     /**
@@ -65,7 +65,8 @@ class StorePolicy
      */
     public function delete(User $user, Store $store)
     {
-        return  $user->role_id === 3 && $user->id === $store->user_id;
+        return ($user->isAdministrator || $user->isSuperAdministrator()) ||
+            ($user->isVendor() && $user->id === $store->user_id);
     }
 
     /**
@@ -77,7 +78,7 @@ class StorePolicy
      */
     public function restore(User $user, Store $store)
     {
-        return  in_array($user->role_id, [1, 2]);
+        return  $user->isSuperAdministrator() || $user->isAdministrator();
     }
 
     /**
@@ -89,7 +90,6 @@ class StorePolicy
      */
     public function forceDelete(User $user, Store $store)
     {
-        //
-        return  in_array($user->role_id, [1, 2]);
+        return  $user->isSuperAdministrator() || $user->isAdministrator();
     }
 }

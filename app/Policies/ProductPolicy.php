@@ -41,7 +41,7 @@ class ProductPolicy
      */
     public function create(User $user)
     {
-        return $user->roles->id === 3;
+        return $user->isVendor();
     }
 
     /**
@@ -53,8 +53,8 @@ class ProductPolicy
      */
     public function update(User $user, Product $product)
     {
-        return (\in_array($user->roles->id, [1, 2])) ||
-            ($user->role_id === 3 && $user->store->id === $product->store->id);
+        return ($user->isAdministrator() || $user->isSuperAdministrator()) ||
+            ($user->isVendor() && $user->store->id === $product->store->id);
     }
 
     /**
@@ -66,8 +66,7 @@ class ProductPolicy
      */
     public function delete(User $user, Product $product)
     {
-
-        return (\in_array($user->roles->id, [1, 2])) ||
+        return ($user->isAdministrator() || $user->isSuperAdministrator()) ||
             ($user->store->id === $product->store->id);
     }
 
@@ -80,7 +79,8 @@ class ProductPolicy
      */
     public function restore(User $user, Product $product)
     {
-        return \in_array($user->role_id, [1, 2]) || ($user->role_id === 3 && $user->store->id === $product->store->id);
+        return ($user->isAdministrator() || $user->isSuperAdministrator()) ||
+            ($user->isVendor() && $user->store->id === $product->store->id);
     }
 
     /**
@@ -92,7 +92,7 @@ class ProductPolicy
      */
     public function forceDelete(User $user, Product $product)
     {
-        //
-        return \in_array($user->role_id, [1, 2]) || ($user->role_id === 3 && $user->store->id === $product->store->id);
+        return ($user->isAdministrator() || $user->isSuperAdministrator()) ||
+            ($user->isVendor() && $user->store->id === $product->store->id);
     }
 }

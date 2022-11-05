@@ -60,6 +60,27 @@ class User extends Authenticatable implements JWTSubject
     }
 
 
+    // helper
+    public function isSuperAdministrator()
+    {
+        return $this->roles->id === 1; // super admin id = 1
+    }
+
+    public function isAdministrator()
+    {
+        return $this->roles->id === 2; // admin id adalah 2
+    }
+
+    public function isVendor()
+    {
+        return $this->roles->id === 3; // vendor id adalah 3
+    }
+
+    public function isCustomer()
+    {
+        return $this->roles->id === 4; // vendor id adalah 3
+    }
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
