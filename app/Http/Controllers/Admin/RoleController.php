@@ -29,4 +29,35 @@ class RoleController extends Controller
 
         $this->success(200, "Role created", $role);
     }
+
+    public function update(Request $request, $id)
+    {
+        $this->authorize('update', Role::class);
+
+        $role = Role::findOrFail($id);
+
+        $request->validate([
+            'role' => "string|unique:roles,role"
+        ]);
+
+        $role->fill(["role" => $request->role])->saveOrFail();
+
+        $this->success(200, "Role created", $role->fresh());
+    }
+
+
+    public function destroy(Request $request, $id)
+    {
+        $this->authorize('delete', Role::class);
+
+        $role = Role::findOrFail($id);
+
+        $request->validate([
+            'role' => "string|unique:roles,role"
+        ]);
+
+        $role->fill(["role" => $request->role])->saveOrFail();
+
+        $this->success(200, "Role created", $role->fresh());
+    }
 }

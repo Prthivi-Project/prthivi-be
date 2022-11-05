@@ -54,6 +54,7 @@ class RolePolicy
     public function update(User $user, Role $role)
     {
         //
+        return \in_array($user->role_id, [1, 2]);
     }
 
     /**
@@ -65,7 +66,7 @@ class RolePolicy
      */
     public function delete(User $user, Role $role)
     {
-        //
+        return \in_array($user->role_id, [1, 2]) && !(in_array($role->id, [1, 2]));
     }
 
     /**
@@ -78,7 +79,6 @@ class RolePolicy
     public function restore(User $user, Role $role)
     {
         //
-        \info($user);
         return \in_array($user->role_id, [1, 2]);
     }
 
@@ -91,6 +91,6 @@ class RolePolicy
      */
     public function forceDelete(User $user, Role $role)
     {
-        //
+        return \in_array($user->role_id, [1, 2]) && !(in_array($role->id, [1, 2]));
     }
 }
