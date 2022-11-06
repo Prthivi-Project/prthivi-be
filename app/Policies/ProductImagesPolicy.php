@@ -68,7 +68,10 @@ class ProductImagesPolicy
      */
     public function delete(User $user, ProductImages $productImages)
     {
-        //
+        $product = $productImages->product;
+
+        return ($user->isSuperAdministrator() || $user->isAdministrator()) ||
+            ($user->isVendor() && $product->isOwnerProduct($user));
     }
 
     /**
@@ -80,7 +83,10 @@ class ProductImagesPolicy
      */
     public function restore(User $user, ProductImages $productImages)
     {
-        //
+        $product = $productImages->product;
+
+        return ($user->isSuperAdministrator() || $user->isAdministrator()) ||
+            ($user->isVendor() && $product->isOwnerProduct($user));
     }
 
     /**
@@ -92,6 +98,8 @@ class ProductImagesPolicy
      */
     public function forceDelete(User $user, ProductImages $productImages)
     {
-        //
+        $product = $productImages->product;
+
+        return $user->isVendor() && $product->isOwnerProduct($user);
     }
 }

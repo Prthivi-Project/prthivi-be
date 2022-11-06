@@ -54,7 +54,7 @@ class ProductPolicy
     public function update(User $user, Product $product)
     {
         return ($user->isAdministrator() || $user->isSuperAdministrator()) ||
-            ($user->isVendor() && $user->store->id === $product->store->id);
+            ($user->isVendor() && $user->store->id === $product->store_id);
     }
 
     /**
@@ -67,7 +67,7 @@ class ProductPolicy
     public function delete(User $user, Product $product)
     {
         return ($user->isAdministrator() || $user->isSuperAdministrator()) ||
-            ($user->store->id === $product->store->id);
+            ($user->store->id === $product->store_id);
     }
 
     /**
@@ -80,7 +80,7 @@ class ProductPolicy
     public function restore(User $user, Product $product)
     {
         return ($user->isAdministrator() || $user->isSuperAdministrator()) ||
-            ($user->isVendor() && $user->store->id === $product->store->id);
+            ($user->isVendor() && $user->store->id === $product->store_id);
     }
 
     /**
@@ -93,6 +93,6 @@ class ProductPolicy
     public function forceDelete(User $user, Product $product)
     {
         return ($user->isAdministrator() || $user->isSuperAdministrator()) ||
-            ($user->isVendor() && $user->store->id === $product->store->id);
+            ($user->isVendor() && $user->store->id === $product->store_id);
     }
 }

@@ -53,9 +53,7 @@ class RolePolicy
      */
     public function update(User $user, Role $role)
     {
-        //
         return $user->isAdministrator() || $user->isSuperAdministrator();
-        return \in_array($user->role_id, [1, 2]);
     }
 
     /**
@@ -79,7 +77,6 @@ class RolePolicy
      */
     public function restore(User $user, Role $role)
     {
-        //
         return $user->isAdministrator() || $user->isSuperAdministrator();
     }
 
