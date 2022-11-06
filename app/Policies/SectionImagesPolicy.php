@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Role;
+use App\Models\LandingPage\SectionImages;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class RolePolicy
+class SectionImagesPolicy
 {
     use HandlesAuthorization;
 
@@ -25,10 +25,10 @@ class RolePolicy
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Role  $role
+     * @param  \App\Models\LandingPage\SectionImages  $sectionImages
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, Role $role)
+    public function view(User $user, SectionImages $sectionImages)
     {
         //
     }
@@ -41,58 +41,54 @@ class RolePolicy
      */
     public function create(User $user)
     {
-        return $user->isAdministrator() || $user->isSuperAdministrator();
+        return $user->isSuperAdministrator() || $user->isAdministrator();
     }
 
     /**
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Role  $role
+     * @param  \App\Models\LandingPage\SectionImages  $sectionImages
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Role $role)
+    public function update(User $user, SectionImages $sectionImages)
     {
-        //
-        return $user->isAdministrator() || $user->isSuperAdministrator();
-        return \in_array($user->role_id, [1, 2]);
+        return $user->isSuperAdministrator() || $user->isAdministrator();
     }
 
     /**
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Role  $role
+     * @param  \App\Models\LandingPage\SectionImages  $sectionImages
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Role $role)
+    public function delete(User $user, SectionImages $sectionImages)
     {
-        return $user->isAdministrator() || $user->isSuperAdministrator();
+        return $user->isSuperAdministrator() || $user->isAdministrator();
     }
 
     /**
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Role  $role
+     * @param  \App\Models\LandingPage\SectionImages  $sectionImages
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, Role $role)
+    public function restore(User $user, SectionImages $sectionImages)
     {
-        //
-        return $user->isAdministrator() || $user->isSuperAdministrator();
+        return $user->isSuperAdministrator() || $user->isAdministrator();
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Role  $role
+     * @param  \App\Models\LandingPage\SectionImages  $sectionImages
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, Role $role)
+    public function forceDelete(User $user, SectionImages $sectionImages)
     {
-        return $user->isAdministrator() || $user->isSuperAdministrator()
-            && !(in_array($role->id, [1, 2]));
+        return $user->isSuperAdministrator() || $user->isAdministrator();
     }
 }

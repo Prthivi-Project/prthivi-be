@@ -118,6 +118,7 @@ class SectionImageController extends Controller
      */
     public function destroy($id)
     {
+        $this->authorize('delete', SectionImages::class);
         $sectionImages = SectionImages::findOrFail($id);
         if ($sectionImages->image_url !== null) {
             $filePath  = str_replace(\asset("storage"), "", $sectionImages->image_url);

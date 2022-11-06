@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\LandingPage\Section;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class LandingPageManagementRequest extends FormRequest
 {
@@ -13,7 +15,7 @@ class LandingPageManagementRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return Gate::authorize('create', Section::class);
     }
 
     /**

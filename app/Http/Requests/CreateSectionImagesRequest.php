@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\LandingPage\SectionImages;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class CreateSectionImagesRequest extends FormRequest
 {
@@ -13,7 +15,7 @@ class CreateSectionImagesRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return Gate::authorize('create', SectionImages::class);
     }
 
     /**

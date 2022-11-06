@@ -2,11 +2,12 @@
 
 namespace App\Policies;
 
-use App\Models\Role;
+use App\Models\Product;
+use App\Models\ProductImages;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class RolePolicy
+class ProductImagesPolicy
 {
     use HandlesAuthorization;
 
@@ -25,10 +26,10 @@ class RolePolicy
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Role  $role
+     * @param  \App\Models\ProductImages  $productImages
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, Role $role)
+    public function view(User $user, ProductImages $productImages)
     {
         //
     }
@@ -39,60 +40,58 @@ class RolePolicy
      * @param  \App\Models\User  $user
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function create(User $user)
+    public function create(User $user, Product $product)
     {
-        return $user->isAdministrator() || $user->isSuperAdministrator();
+        return $user->isVendor() && $product->isOwnerProduct($user);
     }
 
     /**
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Role  $role
+     * @param  \App\Models\ProductImages  $productImages
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Role $role)
+    public function update(User $user, ProductImages $productImages)
     {
-        //
-        return $user->isAdministrator() || $user->isSuperAdministrator();
-        return \in_array($user->role_id, [1, 2]);
+        $product = $productImages->product;
+
+        return $user->isVendor() && $product->isOwnerProduct($user);
     }
 
     /**
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Role  $role
+     * @param  \App\Models\ProductImages  $productImages
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Role $role)
+    public function delete(User $user, ProductImages $productImages)
     {
-        return $user->isAdministrator() || $user->isSuperAdministrator();
+        //
     }
 
     /**
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Role  $role
+     * @param  \App\Models\ProductImages  $productImages
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, Role $role)
+    public function restore(User $user, ProductImages $productImages)
     {
         //
-        return $user->isAdministrator() || $user->isSuperAdministrator();
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Role  $role
+     * @param  \App\Models\ProductImages  $productImages
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, Role $role)
+    public function forceDelete(User $user, ProductImages $productImages)
     {
-        return $user->isAdministrator() || $user->isSuperAdministrator()
-            && !(in_array($role->id, [1, 2]));
+        //
     }
 }

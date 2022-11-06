@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\ProductImages;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class ProductImageUpdateRequest extends FormRequest
 {
@@ -24,8 +26,11 @@ class ProductImageUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            "product_image" => "nullable",
-            "product_image.*" => "file|mimes:png,jpg,webp",
+            'product_id' => ['required', 'exists:products,id'],
+            'product_image' => ['file', 'mimes:png,jpg,webp'],
+            'product_image_base64' => ["base64image"],
+            'color_id'  => ['numeric', 'exists:colors,id'],
+            'priority_level' => ['numeric'],
             "image_url" => "url"
         ];
     }

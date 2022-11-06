@@ -29,17 +29,11 @@ Route::group(["prefix" => "v1",], function () {
 
     require __DIR__ . '/auth.php';
 
-    Route::group(["as" => "landingpage.", "prefix" => "landing-page", 'middleware' => 'jwt.verify'], function () {
-        Route::delete("/{id}", [LandingPageManagementController::class, "destroy"])->name("destroy");
-
-        Route::put("/{id}", [LandingPageManagementController::class, "update"])->name("update");
-
-        Route::post("/", [LandingPageManagementController::class, "store"])->name("store");
-
-        Route::get("/", [LandingPageManagementController::class, "index"])
-            ->withoutMiddleware('jwt.verify')
-            ->name("index");
-
+    Route::group([
+        "as" => "landingpage.",
+        "prefix" => "landing-page",
+        'middleware' => 'jwt.verify'
+    ], function () {
         Route::as('section_images')->prefix('section-images')->group(function () {
             Route::delete("/{id}", [SectionImageController::class, "destroy"])
                 ->name("delete");
@@ -48,10 +42,28 @@ Route::group(["prefix" => "v1",], function () {
             Route::post("/", [SectionImageController::class, "store"])
                 ->name("store");
         });
+
+        Route::delete("/{id}", [LandingPageManagementController::class, "destroy"])
+            ->name("destroy");
+
+        Route::put("/{id}", [LandingPageManagementController::class, "update"])
+            ->name("update");
+
+        Route::get("/{id}", [LandingPageManagementController::class, "show"])
+            ->withoutMiddleware('jwt.verify')
+            ->name("show");
+
+        Route::post("/", [LandingPageManagementController::class, "store"])
+            ->name("store");
+
+        Route::get("/", [LandingPageManagementController::class, "index"])
+            ->withoutMiddleware('jwt.verify')
+            ->name("index");
     });
 
     Route::group(["as" => "products.", "prefix" => "products", 'middleware' => 'jwt.verify'], function () {
-        Route::put("/images", [ProductImageController::class, 'update'])->name("images.update");
+        Route::put("/images/{id}", [ProductImageController::class, 'update'])->name("images.update");
+        Route::post("/images", [ProductImageController::class, 'store'])->name("images.store");
         Route::delete("/{product}", [ProductController::class, "destroy"])->name("destroy");
         Route::put("/{id}", [ProductController::class, "update"])->name("update");
         Route::get("/{id}", [ProductController::class, "show"])->name("show")->withoutMiddleware('jwt.verify');
