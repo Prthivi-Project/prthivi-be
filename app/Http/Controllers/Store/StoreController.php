@@ -56,18 +56,16 @@ class StoreController extends Controller
         $validated = $request->safe()->except("store_image");
         $validated['user_id'] = $request->user()->id;
         $validated['slug'] = Str::slug($request->name . " " . Str::random(3));
-        $store = Store::create($validated);
-        if (!$store) {
-            return $this->error(400, "Error occur while creating new resource", null);
-        }
+        $store = new Store($validated);
 
         if ($request->hasFile("store_image")) {
             $file = $request->file("store_image");
             $path = $this->storeMediaAsFile($file, self::$dirName);
             $store->fill([
                 "photo_url" => \asset("storage/$path")
-            ])->saveOrFail();
+            ]);
         }
+        $store->saveOrFail();
 
         $user = User::withWhereHas('store', function ($query) use ($store) {
             $query->where('id', $store->id);

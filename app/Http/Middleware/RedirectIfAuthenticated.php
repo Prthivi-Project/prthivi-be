@@ -6,6 +6,7 @@ use App\Providers\RouteServiceProvider;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class RedirectIfAuthenticated
 {
@@ -23,6 +24,7 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
+                if ($request->is('api/*')) throw new AccessDeniedHttpException("This request has been authenticated. You dont need to login anymore. Refresh instead");
                 return redirect(RouteServiceProvider::HOME);
             }
         }
