@@ -59,27 +59,34 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(Store::class);
     }
 
+    public function products()
+    {
+        return $this->hasManyThrough(Product::class, Store::class);
+    }
+
 
     // helper
     public function isSuperAdministrator()
     {
-        return $this->roles->id === 1; // super admin id = 1
+        return $this->role_id === 1; // super admin id = 1
     }
 
     public function isAdministrator()
     {
-        return $this->roles->id === 2; // admin id adalah 2
+        return $this->role_id === 2; // admin id adalah 2
     }
 
     public function isVendor()
     {
-        return $this->roles->id === 3; // vendor id adalah 3
+        return $this->role_id === 3; // vendor id adalah 3
     }
 
     public function isCustomer()
     {
-        return $this->roles->id === 4; // vendor id adalah 3
+        return $this->role_id === 4; // vendor id adalah 3
     }
+
+
 
     public function getJWTIdentifier()
     {
