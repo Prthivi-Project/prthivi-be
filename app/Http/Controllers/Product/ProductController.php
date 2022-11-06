@@ -143,7 +143,7 @@ class ProductController extends Controller
             }
         }
 
-        $res = $product->images()->createMany($filePathArray);
+        $res = $product->images()->insert($filePathArray);
         if (!$res) {
             return $this->error(500, "Error occur while creating new resource", null);
         }
