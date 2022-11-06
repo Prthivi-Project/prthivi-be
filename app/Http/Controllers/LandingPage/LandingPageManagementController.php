@@ -137,7 +137,7 @@ class LandingPageManagementController extends Controller
 
             $imgArray = array();
             foreach ($request->file("section_images", []) as $file) {
-                $imagePath = $this->storeMedia($file, self::$dirName);
+                $imagePath = $this->storeMediaAsFile($file, self::$dirName);
                 if (!$imagePath) {
                     return $this->error(500, "Error occur while uploading photo", null);
                 }
