@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             ->has(
                 Product::factory()
                     ->hasImages()
-                    ->count(100)
+                    ->count(110)
             )
             ->create();
 
