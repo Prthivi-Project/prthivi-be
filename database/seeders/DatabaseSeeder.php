@@ -19,8 +19,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        User::factory(20)->create();
-
+        $this->call(RoleSeeder::class);
+        $this->call(UserSeeder::class);
 
         $user  = User::factory()->create();
         Store::factory()
@@ -31,6 +31,8 @@ class DatabaseSeeder extends Seeder
                     ->count(100)
             )
             ->create();
+
         $this->call(CategorySeeder::class);
+        $this->call(ColorSeeder::class);
     }
 }

@@ -29,6 +29,7 @@ class StoreUpdateRequest extends FormRequest
             "address" => ["string"],
             "photo_url" => ["url"],
             "store_image" => ["file", "mimes:png,jpg,webp"],
+            "store_image_base64" => ['string', 'base64image', "base64mimeTypes:png,jpg,jpeg,webp", "base64max:2098"],
             "map_location" => ["nullable", "string"],
         ];
     }

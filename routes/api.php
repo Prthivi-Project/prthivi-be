@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\LandingPage\LandingPageManagementController;
 use App\Http\Controllers\LandingPage\SectionImageController;
 use App\Http\Controllers\Product\ProductController;
@@ -25,12 +26,62 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(["prefix" => "v1",], function () {
     //
-    Route::group(["as" => "landingpage.", "prefix" => "landing-page"], function () {
-        Route::delete("/{id}", [LandingPageManagementController::class, "destroy"])->name("destroy");
-        Route::put("/{id}", [LandingPageManagementController::class, "update"])->name("update");
-        Route::post("/", [LandingPageManagementController::class, "store"])->name("store");
-        Route::get("/", [LandingPageManagementController::class, "index"])->name("index");
-        Route::put("/section-images/{sectionImages}", [SectionImageController::class, "update"])->name("section_images.update");
+
+    require __DIR__ . '/auth.php';
+
+    Route::group([
+        "as" => "landingpage.",
+        "prefix" => "landing-page",
+        'middleware' => 'jwt.verify'
+    ], function () {
+        Route::as('section_images')->prefix('section-images')->group(function () {
+            Route::delete("/{id}", [SectionImageController::class, "destroy"])
+                ->name("delete");
+            Route::put("/{id}", [SectionImageController::class, "update"])
+                ->name("update");
+            Route::post("/", [SectionImageController::class, "store"])
+                ->name("store");
+        });
+
+        Route::delete("/{id}", [LandingPageManagementController::class, "destroy"])
+            ->name("destroy");
+
+        Route::put("/{id}", [LandingPageManagementController::class, "update"])
+            ->name("update");
+
+        Route::get("/{id}", [LandingPageManagementController::class, "show"])
+            ->withoutMiddleware('jwt.verify')
+            ->name("show");
+
+        Route::post("/", [LandingPageManagementController::class, "store"])
+            ->name("store");
+
+        Route::get("/", [LandingPageManagementController::class, "index"])
+            ->withoutMiddleware('jwt.verify')
+            ->name("index");
+    });
+
+    Route::group(["as" => "products.", "prefix" => "products", 'middleware' => 'jwt.verify'], function () {
+        Route::put("/images/{id}", [ProductImageController::class, 'update'])->name("images.update");
+        Route::post("/images", [ProductImageController::class, 'store'])->name("images.store");
+        Route::delete("/{product}", [ProductController::class, "destroy"])->name("destroy");
+        Route::put("/{id}", [ProductController::class, "update"])->name("update");
+        Route::get("/{id}", [ProductController::class, "show"])->name("show")->withoutMiddleware('jwt.verify');
+        Route::post("/", [ProductController::class, "store"])->name("store");
+        Route::get("/", [ProductController::class, "index"])->name("index")->withoutMiddleware('jwt.verify');
+    });
+
+    Route::group(["as" => "store.", "prefix" => "stores", 'middleware' => 'jwt.verify'], function () {
+        Route::put('/{slug}', [StoreController::class, "update"])->name("update");
+        Route::delete('/{slug}', [StoreController::class, "destroy"])->name("delete");
+        Route::post('/', [StoreController::class, "create"])->name("create");
+        Route::get('/', [StoreController::class, "index"])->withoutMiddleware('jwt.verify');
+    });
+
+    Route::group(["as" => "user.", "prefix" => "users", 'middleware' => 'jwt.verify'], function () {
+        Route::group(["as" => 'roles.', 'prefix' => 'roles'], function () {
+            Route::post('/', [RoleController::class, 'store'])->name("store");
+        });
     });
 
     Route::group(["as" => "products.", "prefix" => "products"], function () {

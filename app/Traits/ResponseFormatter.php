@@ -13,7 +13,7 @@ trait ResponseFormatter
                 "message" => $message
             ],
             "data" => $data
-        ]);
+        ], $code);
     }
 
     public function error($code, $message, $error)
@@ -25,7 +25,7 @@ trait ResponseFormatter
                 "message" => $message
             ],
             "error" => $error
-        ]);
+        ], $code);
         //
     }
 }

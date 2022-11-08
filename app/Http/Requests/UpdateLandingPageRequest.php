@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\LandingPage\Section;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class UpdateLandingPageRequest extends FormRequest
 {
@@ -13,7 +15,7 @@ class UpdateLandingPageRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return Gate::authorize('update', Section::class);
     }
 
     /**
@@ -24,9 +26,11 @@ class UpdateLandingPageRequest extends FormRequest
     public function rules()
     {
         return [
+            "section_images_64base" => "nullable",
+            "section_images_64base.*" => "base64image|base64mimes:png,jpg,webp|base64max:2098",
             "section_images" => "nullable",
             "section_images.*" => "file|mimes:png,jpg,webp",
-            "number" => "numeric",
+            "number" => "numeric|unique:sections,number",
             "section_title" => "string",
             "section_description" => "string",
             'button_link' => 'string',

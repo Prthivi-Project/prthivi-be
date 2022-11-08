@@ -57,8 +57,13 @@ class LandingPageManagementController extends Controller
         $this->checkAndCreateDirIfNotExist(self::$dirName);
 
         if ($request->section_images_64base) {
-            $filePath =  $this->storeMediaAsBased64($request->section_images_64base, self::$dirName);
-            $section->images()->create(['image_url' => asset("storage/" . $filePath)]);
+            $imageArr = array();
+            foreach ($request->section_images_64base as $key => $file) {
+                $filePath =  $this->storeMediaAsBased64($file, self::$dirName);
+                $imageArr[] = ['image_url' => asset("storage/" . $filePath)];
+            }
+
+            $section->images()->createMany($imageArr);
         }
 
         if ($request->hasFile("section_images")) {
@@ -73,10 +78,10 @@ class LandingPageManagementController extends Controller
                     );
                 }
 
-                $imgArray[] = ["section_id" => $section->id, "image_url" => \asset("storage/" . $imagePath)];
+                $imgArray[] = ["image_url" => \asset("storage/" . $imagePath)];
             }
 
-            $section->images()->insert($imgArray);
+            $section->images()->createMany($imgArray);
 
 
             if (!$section) {
@@ -99,7 +104,8 @@ class LandingPageManagementController extends Controller
      */
     public function show($id)
     {
-        //
+        $section = Section::with('images')->findOrFail($id);
+        return $this->success(200, "OK", $section);
     }
 
     /**
@@ -115,11 +121,11 @@ class LandingPageManagementController extends Controller
         if (!$section) {
             return $this->error(404, "Not found", "No query result for section id $id");
         }
-        $validated = $request->except("section_images");
+        $validated = $request->except("section_images", "section_images_64base");
 
         $section->fill($validated);
 
-        if ($request->hasFile("section_images")) {
+        if ($request->hasFile("section_images") || $request->section_images_64base) {
             if (\count($section->images) > 0) {
                 foreach ($section->images as $file) {
                     $filePath  = str_replace(\asset("storage"), "", $file->image_url);
@@ -131,7 +137,21 @@ class LandingPageManagementController extends Controller
 
             $imgArray = array();
             foreach ($request->file("section_images", []) as $file) {
-                $imagePath = $this->storeMedia($file, self::$dirName);
+                $imagePath = $this->storeMediaAsFile($file, self::$dirName);
+                if (!$imagePath) {
+                    return $this->error(500, "Error occur while uploading photo", null);
+                }
+
+                $imgArray[] = [
+                    "section_id" => $section->id,
+                    "image_url" => \asset("storage/" . $imagePath),
+                    "created_at" => \now(),
+                    "updated_at" => now()
+                ];
+            }
+            foreach ($request->section_images_64base as $file) {
+                $imagePath =  $this->storeMediaAsBased64($file, self::$dirName);
+
                 if (!$imagePath) {
                     return $this->error(500, "Error occur while uploading photo", null);
                 }
@@ -159,7 +179,8 @@ class LandingPageManagementController extends Controller
      */
     public function destroy($id)
     {
-        $section = Section::with("images")->find($id);
+        $this->authorize('delete', Section::class);
+        $section = Section::with("images")->findOrFail($id);
         if (!$section) {
             return $this->error(404, "Not found", "No query result for section id $id");
         }

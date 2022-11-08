@@ -24,13 +24,13 @@ class StoreCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            "name" => ["required", "string", "alpha"],
+            "name" => ["required", "string"],
             "description" => ["required", "string"],
             "address" => ["required", "string"],
             "photo_url" => ["url", "required_if:store_image,file"],
-            "store_image" => ["required_if:photo_url,url", "file", "mimes:png,jpg,webp"],
+            "store_image" => ["required_if:photo_url,null", "file", "mimes:png,jpg,webp"],
+            "store_image_base64" => ['string', 'base64image', "base64max:2098"],
             "map_location" => ["nullable", "string"],
-            "user_id" => ["required", "exists:users,id"],
         ];
     }
 }

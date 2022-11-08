@@ -17,7 +17,7 @@ return new class extends Migration
     {
         Schema::create('sections', function (Blueprint $table) {
             $table->id();
-            $table->integer("number");
+            $table->integer("number")->unique();
             $table->string("section_title")->nullable();
             $table->string("section_description")->nullable();
             $table->string("button_link")->nullable();

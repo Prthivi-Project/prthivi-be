@@ -4,33 +4,47 @@ namespace App\Traits;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use  Symfony\Component\HttpFoundation\File\File;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+
 // use Symfony\Component\Mime\Encoder\Base64Encoder;
-// use Intervention\Image\ImageManagerStatic as Image;
 
 // require 'vendor/autoload.php';
 
 
 trait MediaUpload
 {
+    /**
+     * Funciton ini digunakan untuk memindahkan file ke dalam storage
+     * @param mixed $file
+     * @param string $dirname
+     * @return string|false
+     * @throws Illuminate\Validation\ValidationException
+     * @throws  Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException
+     */
     public function storeMediaAsBased64($file, $dirName)
     {
-        // $base64_image = "data:image/jpeg;base64, blahblahablah";
+        $isValid = preg_match('/^data:image\/(\w+);base64,/', $file);
+        \throw_if(!$isValid, BadRequestHttpException::class, "Bad base64 image");
 
-        if (preg_match('/^data:image\/(\w+);base64,/', $file)) {
-            $data = substr($file, strpos($file, ',') + 1);
+        $data = substr($file, strpos($file, ',') + 1);
 
-            $image_parts = explode(";base64,", $file);
-            $image_type_aux = explode("image/", $image_parts[0]);
-            $image_type = $image_type_aux[1]; // mimes
-            $data = base64_decode($data);
-            $fileName = \uniqid() . "." . $image_type;
+        $imageParts = explode(";base64,", $file);
+        $imageTypeAux = explode("image/", $imageParts[0]);
+        $imageType = $imageTypeAux[1]; // mimes
 
-            $filePath = "tmp/$dirName/$fileName";
-            Storage::disk('public')->put($filePath, $data);
+        $data = base64_decode($data);
 
-            return $filePath;
-        }
+        \throw_if(!$data, CannotWriteFileException::class, "Cannot decode base64");
+
+        $fileName = \uniqid() . "." . $imageType;
+
+        $filePath = "tmp/$dirName/$fileName";
+        $isStored = Storage::disk('public')->put($filePath, $data);
+        \throw_if(!$isStored, CannotWriteFileException::class, "Cannot write the file");
+
+        return $filePath;
     }
 
     public function storeMediaAsFile(UploadedFile $file, $dirName)

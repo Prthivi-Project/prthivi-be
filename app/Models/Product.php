@@ -31,8 +31,27 @@ class Product extends Model
         return $this->belongsTo(Store::class);
     }
 
+    public function owner()
+    {
+        return $this->hasOneThrough(User::class, Store::class);
+    }
+
     public function images()
     {
         return $this->hasMany(ProductImages::class);
+    }
+
+    public function colors()
+    {
+        return $this->belongsToMany(Color::class, 'product_colors');
+    }
+
+
+
+    // helpers
+
+    public function isOwnerProduct(User $user)
+    {
+        return $this->store_id === $user->store->id;
     }
 }

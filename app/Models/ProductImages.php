@@ -12,6 +12,13 @@ class ProductImages extends Model
     protected $fillable = [
         "product_id",
         "image_url",
+        'priority_level',
+        'color_id',
+    ];
+
+    protected $hidden = [
+        'created_at',
+        "updated_at",
     ];
 
     public function product()
