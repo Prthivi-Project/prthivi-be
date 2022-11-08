@@ -83,4 +83,19 @@ Route::group(["prefix" => "v1",], function () {
             Route::post('/', [RoleController::class, 'store'])->name("store");
         });
     });
+
+    Route::group(["as" => "products.", "prefix" => "products"], function () {
+        Route::put("/images", [ProductImageController::class, 'update'])->name("images.update");
+        Route::delete("/{id}", [ProductController::class, "destroy"])->name("destroy");
+        Route::put("/{id}", [ProductController::class, "update"])->name("update");
+        Route::post("/", [ProductController::class, "store"])->name("store");
+        Route::get("/", [ProductController::class, "index"])->name("index");
+    });
+
+    Route::group(["as" => "store.", "prefix" => "stores"], function () {
+        Route::delete('/{id}', [StoreController::class, "destroy"])->name("delete");
+        Route::put('/{id}', [StoreController::class, "update"])->name("update");
+        Route::post('/', [StoreController::class, "create"])->name("create");
+        Route::get('/', [StoreController::class, "index"]);
+    });
 });
