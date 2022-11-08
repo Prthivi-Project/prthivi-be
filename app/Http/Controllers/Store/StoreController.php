@@ -5,13 +5,15 @@ namespace App\Http\Controllers\Store;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\StoreCreateRequest;
 use App\Http\Requests\Store\StoreUpdateRequest;
+use App\Http\Requests\StoreGetAllRequest;
 use App\Models\Store;
-use App\Models\User;
 use App\Traits\MediaRemove;
 use App\Traits\MediaUpload;
 use App\Traits\ResponseFormatter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Throwable;
 
 class StoreController extends Controller
 {
@@ -21,7 +23,7 @@ class StoreController extends Controller
 
     private static $dirName = "store";
 
-    public function index(Request $request)
+    public function index(StoreGetAllRequest $request)
     {
         $id = $request->id;
         $name = $request->name;
@@ -53,31 +55,36 @@ class StoreController extends Controller
     {
         $this->authorize('create', Store::class);
 
-        $validated = $request->safe()->except("store_image");
+        $validated = $request->safe()->except("store_image", "store_image_base64");
+
         $validated['user_id'] = $request->user()->id;
+
         $validated['slug'] = Str::slug($request->name . " " . Str::random(3));
+
         $store = new Store($validated);
 
-        if ($request->hasFile("store_image")) {
-            $file = $request->file("store_image");
-            $path = $this->storeMediaAsFile($file, self::$dirName);
+        $path = "";
+        try {
+            $path = $this->storeImageIfExistInRequest($request);
+
             $store->fill([
-                "photo_url" => \asset("storage/$path")
+                "photo_url" => \asset("storage/" . $path),
             ]);
+
+            $store->saveOrFail();
+
+            $roleUpdated = $store->user()->update(['role_id' => 3]);
+
+            \throw_if(!$roleUpdated, Throwable::class, "Error occur while update role");
+
+            return $this->success(200, "Create store successfully", $store);
+        } catch (FileException $e) {
+            return $this->error(500, "Something went wrong", $e->getMessage());
+        } catch (\Throwable $th) {
+            $isDeleted = $this->removeMedia($path);
+            \throw_if(!$isDeleted, Throwable::class, "Cannot delete the file");
+            return $this->error(500, "Something went wrong", $th->getMessage());
         }
-        $store->saveOrFail();
-
-        $user = User::withWhereHas('store', function ($query) use ($store) {
-            $query->where('id', $store->id);
-        })->update([
-            'role_id' => 3
-        ]);
-
-        if (!$user) {
-            return $this->error(400, "Error occur while update role", null);
-        }
-
-        return $this->success(201, "Product created", $store);
     }
 
 
@@ -92,20 +99,30 @@ class StoreController extends Controller
     public function update(StoreUpdateRequest $request, $slug)
     {
         $store = Store::where('slug', $slug)->firstOrFail();
+
         $this->authorize('update', $store);
 
-        $store->fill($request->safe()->except("store_image"));
-        if ($request->hasFile("store_image")) {
-            $file = $request->file("store_image");
-            $path = $this->storeMediaAsFile($file, self::$dirName);
+        $validated = $request->safe()->except("store_image", "store_image_base64");
+
+        $store->fill($validated);
+
+        try {
+            $path = $this->storeImageIfExistInRequest($request);
+
             $store->fill([
-                "photo_url" => \asset("storage/$path")
+                "photo_url" => \asset("storage/" . $path),
             ]);
+
+            $store->saveOrFail();
+
+            return $this->success(200, "Update successfully", $store);
+        } catch (FileException $e) {
+            return $this->error(500, "Something went wrong", $e->getMessage());
+        } catch (\Throwable $th) {
+            $isDeleted = $this->removeMedia($path);
+            \throw_if(!$isDeleted, Throwable::class, "Cannot delete the file");
+            return $this->error(500, "Something went wrong", $th->getMessage());
         }
-
-        $store->saveOrFail();
-
-        return $this->success(200, "Update successfully", $store->fresh());
     }
 
     /**
@@ -121,5 +138,29 @@ class StoreController extends Controller
         $store->deleteOrFail();
 
         return $this->success(200, "Delete successfully", null);
+    }
+
+
+    /**
+     * Store image file or based64 file if any in request
+     * 
+     * @param Request $request
+     * @return string $filePath
+     * @throws FileException
+     */
+    private function storeImageIfExistInRequest(Request $request)
+    {
+        $path = "";
+        if ($request->hasFile("store_image")) {
+            $file = $request->file("store_image");
+            $path = $this->storeMediaAsFile($file, self::$dirName);
+            \throw_if(!$path, FileException::class, 'Error occur while uploading file');
+        } elseif ($request->store_image_base64) {
+            $file = $request->store_image_base64;
+            $path = $this->storeMediaAsBased64($file, self::$dirName);
+            \throw_if(!$path, FileException::class, 'Error occur while uploading file');
+        }
+
+        return $path;
     }
 }
