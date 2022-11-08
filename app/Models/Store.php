@@ -15,6 +15,7 @@ class Store extends Model
         "address",
         "photo_url",
         "slug",
+        'view_count',
         "map_location",
         'user_id',
     ];
