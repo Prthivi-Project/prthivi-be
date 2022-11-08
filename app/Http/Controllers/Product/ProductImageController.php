@@ -39,6 +39,8 @@ class ProductImageController extends Controller
         $imageFile = $request->file('product_image');
         $filePath = null;
         try {
+            $this->checkAndCreateDirIfNotExist(self::$dirName);
+
             if ($imageBase64) {
                 try {
                     $filePath = $this->storeMediaAsBased64($imageBase64, self::$dirName);

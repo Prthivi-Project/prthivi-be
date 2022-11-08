@@ -232,6 +232,9 @@ class ProductController extends Controller
         $filePathArray = [];
         $imageFile = $request->file('product_images');
         $imageBase64Array = $request->product_image_base64;
+
+        $this->checkAndCreateDirIfNotExist(self::$dirName);
+
         if ($imageFile) {
             foreach ($imageFile as $file) {
                 $filePath = $this->storeMediaAsFile($file, self::$dirName);

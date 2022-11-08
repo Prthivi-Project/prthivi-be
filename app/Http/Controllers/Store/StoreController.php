@@ -107,6 +107,7 @@ class StoreController extends Controller
         $store->fill($validated);
 
         try {
+            $this->checkAndCreateDirIfNotExist(self::$dirName);
             $path = $this->storeImageIfExistInRequest($request);
 
             $store->fill([
