@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Product;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\ProductCreateRequest;
 use App\Http\Requests\Product\ProductUpdateRequest;
-use App\Http\Resources\ProductResource;
+use App\Http\Requests\ProductGetAllRequest;
 use App\Models\Product;
 use App\Traits\MediaRemove;
 use App\Traits\MediaUpload;
 use App\Traits\ResponseFormatter;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Throwable;
 
 class ProductController extends Controller
 {
@@ -24,10 +27,11 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(ProductGetAllRequest $request)
     {
         $id = $request->query("id");
-        $limit  = $request->query("limit") ?: 30;
+        $limit  = $request->query("perPage");
+        $limit  = $limit <= 50 ? $limit : 50;
         $name  = $request->query("name");
         $size  = $request->query("size");
         $status  = $request->query("status");
@@ -70,8 +74,6 @@ class ProductController extends Controller
             });
         }
 
-
-        // order
         $orderWith = "created_at";
         $orderType = "desc";
 
@@ -107,48 +109,29 @@ class ProductController extends Controller
     public function store(ProductCreateRequest $request)
     {
         $validated = $request->safe()->except("product_images", "product_images_base64");
+
         $storeId = \auth('api')->user()->store->id;
         $validated['store_id'] = $storeId;
-        $product = Product::create($validated);
+        try {
+            $product = new Product($validated);
 
-        $filePathArray = [];
+            $paths = $this->storeImageIfExistInRequest($request);
 
-        if ($request->hasFile("product_images")) {
-            foreach ($request->file('product_images', []) as $file) {
-                $filePath = $this->storeMediaAsFile($file, self::$dirName);
+            $res = $product->save();
+            \throw_if(!$res, Throwable::class, "Error while creating new resource");
 
-                $filePathArray[] = [
-                    'image_url' => \asset("storage/" . $filePath),
-                ];
+            $res = $product->images()->createMany($paths);
+            \throw_if(!$res, Throwable::class, "Error occur while uploading new resource");
+
+            return $this->success(201, "Product created", $product->load("images"));
+        } catch (FileException $e) {
+            return $this->error(500, "Something went wrong", $e->getMessage());
+        } catch (Throwable $th) {
+            foreach ($paths as $path) {
+                $this->removeMedia($path);
             }
-        } elseif ($request->product_image_base64) {
-            foreach ($request->product_image_base64 as $key => $file) {
-                $filePath = $this->storeMediaAsBased64($file['image'], self::$dirName);
-                if (!$filePath) {
-                    return $this->error(
-                        500,
-                        "Internal server error",
-                        "Error occur while uploading new resource"
-                    );
-                }
-
-                $filePathArray[] = [
-                    'product_id' => $product->id,
-                    'image_url' => \asset("storage/" . $filePath),
-                    'color_id' => $file['color_id'] ?: null,
-                    'priority_level' => $file['priority_level'] ?: 1,
-                    'created_at' => \now(),
-                    "updated_at" => now()
-                ];
-            }
+            return $this->error(500, "Something went wrong", $th->getMessage());
         }
-
-        $res = $product->images()->insert($filePathArray);
-        if (!$res) {
-            return $this->error(500, "Error occur while creating new resource", null);
-        }
-
-        return $this->success(201, "Product created", $product->load("images"));
     }
 
     /**
@@ -159,7 +142,8 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $data =  Product::with('store', "images", "colors:color,hexa_code")->findOrFail($id);
+        $data =  Product::with('store', "images", "colors:color,hexa_code")->find($id);
+        \abort_if(!$data, 404, "Product not found");
         $data->view_count++;
         $data->saveOrFail();
         return $this->success(200, "OK", $data);
@@ -174,82 +158,48 @@ class ProductController extends Controller
      */
     public function update(ProductUpdateRequest $request, $id)
     {
-        $product = Product::withCount('images')->with("images", 'store')->findOrFail($id);
-        $this->authorize('update', $product);
+        $product = Product::withCount('images')->with("images", 'store')->find($id);
+        \abort_if(!$product, 404, "Product not found");
 
-        $product->fill($request->safe()->except("product_image"));
+        $this->authorize('update', $product);
+        $validated = $request->safe()->except("product_image", 'product_image_base64');
+
+        $product->fill($validated);
         $imageFile = $request->file('product_images');
         $imageBase64Array = $request->product_image_base64;
 
-        if ($imageFile || $imageBase64Array) {
-            if ($product->images) {
-                $product->images()->delete();
+        try {
+            if (($imageFile || $imageBase64Array) && $product->images) {
+                $isDeleted = $product->images()->delete();
 
-                foreach ($product->images as $key => $image) {
+                throw_if(!$isDeleted, Throwable::class, "Error occur while deleting resource");
+
+                foreach ($product->images as $image) {
                     $isDeleted = $this->removeMedia(
                         \str_replace(asset("storage/"), "", $image->image_url)
                     );
 
-                    if (!$isDeleted) {
-                        return $this->error(
-                            500,
-                            "Internal server error",
-                            "Error occur while uploading new resource"
-                        );
-                    }
+                    \throw_if(!$isDeleted, FileException::class, "Cannot delete the file");
                 }
             }
 
+            $paths = $this->storeImageIfExistInRequest($request);
 
-            $filePathArray = [];
+            $done = $product->images()->createMany($paths);
 
-            if ($imageFile) {
-                foreach ($imageFile as $key => $file) {
-                    $filePath = $this->storeMediaAsFile($file, self::$dirName);
+            \throw_if(!$done, Throwable::class, 'Cannot update the images');
 
-                    if (!$filePath) {
-                        return $this->error(
-                            500,
-                            "Internal server error",
-                            "Error occur while uploading new resource"
-                        );
-                    }
-
-                    $filePathArray[] = [
-                        'product_id' => $product->id,
-                        'image_url' => \asset("storage/" . $filePath),
-                        'created_at' => \now(),
-                        "updated_at" => now()
-                    ];
-                }
-            } elseif ($imageBase64Array) {
-                foreach ($imageBase64Array as $key => $value) {
-                    $filePath = $this->storeMediaAsBased64($value['image'], self::$dirName);
-
-                    if (!$filePath) {
-                        return $this->error(
-                            500,
-                            "Internal server error",
-                            "Error occur while uploading new resource"
-                        );
-                    }
-
-                    $filePathArray[] = [
-                        'product_id' => $product->id,
-                        'image_url' => \asset("storage/" . $filePath),
-                        'color_id' => $value['color_id'] ?: null,
-                        'priority_level' => $value['priority_level'] ?? 1,
-                        'created_at' => \now(),
-                        "updated_at" => now()
-                    ];
-                }
+            return $this->success(200, "Update successfully", $product);
+        } catch (\Throwable $th) {
+            if ($th instanceof FileException) {
+                return $this->error(500, "Something went wrong", $th->getMessage());
+            }
+            foreach ($paths as $path) {
+                $this->removeMedia($path);
             }
 
-            $product->images()->insert($filePathArray);
+            return $this->error(500, "Something went wrong", $th->getMessage());
         }
-
-
-        return $this->success(200, "Update successfully", $product->load('images'));
     }
 
     /**
@@ -268,5 +218,45 @@ class ProductController extends Controller
             return $this->error(400, "Error occur while deleting resource",  "Error occur while deleting resource");
         }
         return $this->success(200, "Delete successfully", null);
+    }
+
+
+    /**
+     * Store image file or based64 file if any in request
+     * @param Request $request
+     * @return array $filePathArray
+     * @throws FileException
+     */
+    public function storeImageIfExistInRequest(Request $request)
+    {
+        $filePathArray = [];
+        $imageFile = $request->file('product_images');
+        $imageBase64Array = $request->product_image_base64;
+        if ($imageFile) {
+            foreach ($imageFile as $file) {
+                $filePath = $this->storeMediaAsFile($file, self::$dirName);
+
+                \throw_if(!$filePath, FileException::class, "Error occur while uploading new resource");
+                $filePathArray[] = [
+                    'image_url' => \asset("storage/" . $filePath),
+                ];
+            }
+        } elseif ($imageBase64Array) {
+            foreach ($imageBase64Array as $file) {
+                $filePath = $this->storeMediaAsBased64($file['image'], self::$dirName);
+
+                \throw_if(!$filePath, FileException::class, "Error occur while uploading new resource");
+
+                $filePathArray[] = [
+                    'image_url' => \asset("storage/" . $filePath),
+                    'color_id' => $file['color_id'] ?: null,
+                    'priority_level' => $file['priority_level'] ?: 1,
+                    'created_at' => \now(),
+                    "updated_at" => now()
+                ];
+            }
+        }
+
+        return $filePathArray;
     }
 }
