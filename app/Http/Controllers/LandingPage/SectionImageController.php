@@ -82,6 +82,8 @@ class SectionImageController extends Controller
         $imagePath = '';
 
         if ($base64image || $hasImageFile) {
+            $this->checkAndCreateDirIfNotExist(self::$dirName);
+
             if ($sectionImages->image_url !== null) {
                 $filePath  = str_replace(\asset("storage"), "", $sectionImages->image_url);
                 $isDeleted = $this->removeMedia($filePath);

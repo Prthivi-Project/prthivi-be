@@ -27,8 +27,8 @@ return new class extends Migration
     public function down()
     {
         Schema::table('product_images', function (Blueprint $table) {
-            $table->dropColumn('priority_level');
-            $table->dropColumn('color_id');
+            $table->dropIfExists('priority_level');
+            $table->dropIfExists('color_id');
         });
     }
 };
