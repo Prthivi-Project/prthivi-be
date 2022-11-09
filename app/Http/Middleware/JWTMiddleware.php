@@ -27,9 +27,10 @@ class JWTMiddleware
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
+            $user->setToken(JWTAuth::getToken());
         } catch (\Throwable $th) {
             if ($th instanceof TokenInvalidException) {
-                throw new AccessDeniedHttpException($th->getMessage());
+                throw new AccessDeniedHttpException("Access token is invalid");
             } else if ($th instanceof TokenExpiredException) {
                 throw new UnauthorizedHttpException($th->getMessage());
             } else if ($th instanceof TokenBlacklistedException) {
