@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ResponseFormatter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 
 class PasswordResetLinkController extends Controller
 {
+    use ResponseFormatter;
+
     /**
      * Handle an incoming password reset link request.
      *
@@ -33,6 +36,6 @@ class PasswordResetLinkController extends Controller
             ]);
         }
 
-        return response()->json(['status' => __($status)]);
+        return $this->success(200, __($status), null);
     }
 }
