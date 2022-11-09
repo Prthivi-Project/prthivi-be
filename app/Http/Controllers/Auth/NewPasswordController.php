@@ -14,11 +14,6 @@ use Illuminate\Validation\ValidationException;
 class NewPasswordController extends Controller
 {
 
-    public function index()
-    {
-        return \redirect()->intended(\config('app.frontend_url'));
-    }
-
 
     /**
      * Handle an incoming new password request.

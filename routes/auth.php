@@ -18,10 +18,6 @@ Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
     ->middleware('guest')
     ->name('password.email');
 
-Route::get('/reset-password', [NewPasswordController::class, 'index'])
-    ->middleware('guest')
-    ->name('password.reset');
-
 Route::post('/reset-password', [NewPasswordController::class, 'store'])
     ->middleware('guest')
     ->name('password.update');
