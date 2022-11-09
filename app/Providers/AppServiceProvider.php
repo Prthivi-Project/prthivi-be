@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
         ResetPassword::createUrlUsing(function ($notifiable, $token) {
             return \sprintf(
                 "%s?token=%s&email=%s",
-                \config('app.frontend_url'),
+                \config('app.frontend_url', "http://localhost:4000"),
                 $token,
                 $notifiable->getEmailForPasswordReset()
             );
