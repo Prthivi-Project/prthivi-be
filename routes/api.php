@@ -21,12 +21,7 @@ use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 |
 */
 
-Route::middleware('jwt.verify')->get('/user', function (Request $request) {
-    return JWTAuth::getToken();
-});
-
 Route::group(["prefix" => "v1",], function () {
-    //
 
     require __DIR__ . '/auth.php';
 
