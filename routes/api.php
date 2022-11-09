@@ -8,6 +8,7 @@ use App\Http\Controllers\Product\ProductImageController;
 use App\Http\Controllers\Store\StoreController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,8 +21,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware('jwt.verify')->get('/user', function (Request $request) {
+    return JWTAuth::getToken();
 });
 
 Route::group(["prefix" => "v1",], function () {
@@ -74,7 +75,7 @@ Route::group(["prefix" => "v1",], function () {
     Route::group(["as" => "store.", "prefix" => "stores", 'middleware' => 'jwt.verify'], function () {
         Route::put('/{slug}', [StoreController::class, "update"])->name("update");
         Route::delete('/{slug}', [StoreController::class, "destroy"])->name("delete");
-        Route::post('/', [StoreController::class, "create"])->name("create");
+        Route::post('/', [StoreController::class, "create"])->name("create")->middleware('verified');
         Route::get('/', [StoreController::class, "index"])->withoutMiddleware('jwt.verify');
     });
 
