@@ -32,13 +32,20 @@ class ProductController extends Controller
         $orderBy = $request->query("orderBy");
 
         if ($id) {
-            $product = Product::with("store", "images")->findOrFail($id);
+            $product = Product::with(
+                "store:id,name,photo_url",
+                "images",
+                "categories:name",
+                "colors"
+            )->findOrFail($id);
             return $this->success(200, "OK", $product);
         }
 
         $product = Product::query()->with([
             'images',
             "store",
+            "categories:name",
+            "colors",
         ]);
 
         if ($name) {

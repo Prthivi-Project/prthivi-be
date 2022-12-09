@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\LandingPage\LandingPageManagementController;
 use App\Http\Controllers\LandingPage\SectionImageController;
+use App\Http\Controllers\Product\CategoryProductController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Product\ProductImageController;
 use App\Http\Controllers\Store\StoreController;
@@ -60,12 +62,22 @@ Route::group(["prefix" => "v1",], function () {
     Route::group(["as" => "products.", "prefix" => "products", 'middleware' => 'jwt.verify'], function () {
         Route::put("/images/{id}", [ProductImageController::class, 'update'])->name("images.update");
         Route::post("/images", [ProductImageController::class, 'store'])->name("images.store");
+
+        Route::post("/{id}/category", [CategoryProductController::class, 'attachCategoriesProduct']);
+        Route::delete("/{id}/category", [CategoryProductController::class, 'detachCategoryProduct']);
         Route::delete("/{product}", [ProductController::class, "destroy"])->name("destroy");
         Route::put("/{id}", [ProductController::class, "update"])->name("update");
         Route::get("/{id}", [ProductController::class, "show"])->name("show")->withoutMiddleware('jwt.verify');
         Route::post("/", [ProductController::class, "store"])->name("store");
         Route::get("/", [ProductController::class, "index"])->name("index")->withoutMiddleware('jwt.verify');
     });
+
+    Route::group(["as" => "categories.", "prefix" => "categories", 'middleware' => 'jwt.verify'], function () {
+        Route::put('/{id}', [CategoryController::class, "update"])->name("update");
+        Route::post('/', [CategoryController::class, "store"])->name("create")->middleware('verified');
+        Route::get('/', [CategoryController::class, "index"])->withoutMiddleware('jwt.verify');
+    });
+
 
     Route::group(["as" => "store.", "prefix" => "stores", 'middleware' => 'jwt.verify'], function () {
         Route::put('/{slug}', [StoreController::class, "update"])->name("update");

@@ -23,7 +23,7 @@ class Product extends Model
     // relational
     public function categories()
     {
-        return $this->belongsToMany(Category::class, "user_roles", "product_id");
+        return $this->belongsToMany(Category::class, "product_categories", "product_id");
     }
 
     public function store()

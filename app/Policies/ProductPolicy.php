@@ -45,6 +45,20 @@ class ProductPolicy
     }
 
     /**
+     * Determine whether the user can create models.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function attachCategories(User $user, Product $product)
+    {
+        return ($user->isVendor() && $user->store->id === $product->store->id) ||
+            $user->isSuperAdministrator();
+    }
+
+
+
+    /**
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
