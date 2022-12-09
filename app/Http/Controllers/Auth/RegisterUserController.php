@@ -6,17 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
 use App\Traits\MediaUpload;
-use App\Traits\ResponseFormatter;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
-use Faker\Generator;
 
 class RegisterUserController extends Controller
 {
-    use ResponseFormatter;
     use MediaUpload;
 
 

@@ -25,7 +25,7 @@ class StoreGetAllRequest extends FormRequest
     {
         return [
             'id' => 'numeric',
-            'name' => 'string|alpha_num',
+            'name' => 'string',
         ];
     }
 }

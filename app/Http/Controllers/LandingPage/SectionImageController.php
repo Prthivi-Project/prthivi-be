@@ -16,7 +16,6 @@ class SectionImageController extends Controller
 {
     use MediaUpload;
     use MediaRemove;
-    use ResponseFormatter;
 
     private static $dirName = 'section';
 

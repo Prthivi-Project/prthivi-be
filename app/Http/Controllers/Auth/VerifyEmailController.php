@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\Api\EmailVerificationRequest;
-use App\Traits\ResponseFormatter;
 use Illuminate\Auth\Events\Verified;
 
-class VerifyEmailController
+class VerifyEmailController extends Controller
 {
-    use ResponseFormatter;
     /**
      * Mark the authenticated user's email address as verified.
      *

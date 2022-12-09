@@ -26,7 +26,7 @@ class ProductImageCreateRequest extends FormRequest
         return [
             'product_id' => ['required', 'numeric'],
             'product_image' => ['file', 'mimes:png,jpg,webp'],
-            'product_image_base64' => ["string", "base64image", "base64mimetypes:png,jpg,jpeg,webp", "base64max:2098"],
+            'product_image_base64' => ["string", "base64image", "base64max:2098"],
             'color_id'  => ['numeric', 'exists:colors,id'],
             'priority_level' => ['numeric'],
             "image_url" => "url"

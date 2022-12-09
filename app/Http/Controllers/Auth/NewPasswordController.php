@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Traits\ResponseFormatter;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Validation\Rules;
 use Illuminate\Http\Request;
@@ -14,7 +13,6 @@ use Illuminate\Validation\ValidationException;
 
 class NewPasswordController extends Controller
 {
-    use ResponseFormatter;
 
     /**
      * Handle an incoming new password request.

@@ -3,14 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Traits\ResponseFormatter;
 use Illuminate\Http\Request;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class EmailVerificationNotificationController extends Controller
 {
-    use ResponseFormatter;
-
 
     /**
      * Send a new email verification notification.
