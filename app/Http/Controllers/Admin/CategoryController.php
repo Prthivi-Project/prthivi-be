@@ -11,6 +11,12 @@ class CategoryController extends Controller
 {
     use ResponseFormatter;
 
+    public function index()
+    {
+        $cat = Category::all();
+        return $this->success(200, "Get all categories", $cat);
+    }
+
     public function store(Request $request)
     {
         $this->authorize("create", Category::class);
@@ -25,5 +31,31 @@ class CategoryController extends Controller
         \abort_if(!$category, 500, "Category cannot created");
 
         return $this->success(201, "Berhasil menambahkan category", $category);
+    }
+
+    public function update(Request $request, $category)
+    {
+        $this->authorize("update", $category);
+
+        $request->validate([
+            "name" => ["required", "string"],
+        ]);
+
+
+        $category = $category->update([
+            "name" => $request->name
+        ]);
+
+        \abort_if(!$category, 500, "Category cannot updated");
+
+        return $this->success(200, "Berhasil update category", $category);
+    }
+
+    public function delete($id)
+    {
+        $cat = Category::find($id);
+        \abort_if(!$cat, 404, "Category not found");
+
+        return $this->success(200, "Category deleted", null);
     }
 }
