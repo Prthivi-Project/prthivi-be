@@ -51,11 +51,9 @@ class CategoryController extends Controller
         return $this->success(200, "Berhasil update category", $category);
     }
 
-    public function delete($id)
+    public function delete($category)
     {
-        $cat = Category::find($id);
-        \abort_if(!$cat, 404, "Category not found");
-
+        $category->delete();
         return $this->success(200, "Category deleted", null);
     }
 }
