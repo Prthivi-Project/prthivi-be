@@ -73,7 +73,8 @@ Route::group(["prefix" => "v1",], function () {
     });
 
     Route::group(["as" => "categories.", "prefix" => "categories", 'middleware' => 'jwt.verify'], function () {
-        Route::put('/{id}', [CategoryController::class, "update"])->name("update");
+        Route::delete('/{id}', [CategoryController::class, "delete"])->name("delete");
+        Route::put('/{category}', [CategoryController::class, "update"])->name("update");
         Route::post('/', [CategoryController::class, "store"])->name("create")->middleware('verified');
         Route::get('/', [CategoryController::class, "index"])->withoutMiddleware('jwt.verify');
     });
