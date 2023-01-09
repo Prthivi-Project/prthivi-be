@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
-class StoreGetAllRequest extends FormRequest
+class CategoryAttachRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,8 +25,8 @@ class StoreGetAllRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => 'numeric',
-            'name' => 'string',
+            "categories" => ["required", "array"],
+            "categories.*" => ["exists:categories,id"],
         ];
     }
 }

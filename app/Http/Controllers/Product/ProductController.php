@@ -9,12 +9,10 @@ use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Traits\MediaRemove;
 use App\Traits\MediaUpload;
-use App\Traits\ResponseFormatter;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    use ResponseFormatter;
     use MediaUpload;
     use MediaRemove;
 
@@ -34,13 +32,20 @@ class ProductController extends Controller
         $orderBy = $request->query("orderBy");
 
         if ($id) {
-            $product = Product::with("store", "images")->findOrFail($id);
+            $product = Product::with(
+                "store:id,name,photo_url",
+                "images",
+                "categories:name",
+                "colors"
+            )->findOrFail($id);
             return $this->success(200, "OK", $product);
         }
 
         $product = Product::query()->with([
             'images',
             "store",
+            "categories:name",
+            "colors",
         ]);
 
         if ($name) {
@@ -90,6 +95,7 @@ class ProductController extends Controller
     public function store(ProductCreateRequest $request)
     {
         $validated = $request->except("product_images");
+        $validated["store_id"] = $request->user()->store->id;
         $product = Product::create($validated);
 
         if ($request->hasFile('product_images')) {

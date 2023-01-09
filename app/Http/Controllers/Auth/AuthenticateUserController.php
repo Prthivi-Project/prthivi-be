@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\Api\LoginRequest;
-use App\Traits\ResponseFormatter;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,9 +13,7 @@ use Illuminate\Validation\ValidationException;
 
 class AuthenticateUserController extends Controller
 {
-    use ResponseFormatter;
 
-    //
     public function login(LoginRequest $request)
     {
         $token = $this->authenticate($request);

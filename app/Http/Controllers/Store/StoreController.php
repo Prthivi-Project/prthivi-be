@@ -9,7 +9,6 @@ use App\Http\Requests\StoreGetAllRequest;
 use App\Models\Store;
 use App\Traits\MediaRemove;
 use App\Traits\MediaUpload;
-use App\Traits\ResponseFormatter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -17,7 +16,6 @@ use Throwable;
 
 class StoreController extends Controller
 {
-    use ResponseFormatter;
     use MediaUpload;
     use MediaRemove;
 

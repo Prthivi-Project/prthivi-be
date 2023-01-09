@@ -11,8 +11,6 @@ use Symfony\Component\Finder\Exception\AccessDeniedException;
 
 class RoleController extends Controller
 {
-    use ResponseFormatter;
-    //
     public function store(Request $request)
     {
         $this->authorize('create', Role::class);

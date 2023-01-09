@@ -9,7 +9,6 @@ use App\Models\Product;
 use App\Models\ProductImages;
 use App\Traits\MediaRemove;
 use App\Traits\MediaUpload;
-use App\Traits\ResponseFormatter;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -20,7 +19,6 @@ class ProductImageController extends Controller
 {
     use MediaUpload;
     use MediaRemove;
-    use ResponseFormatter;
 
     private static $dirName = "product";
 

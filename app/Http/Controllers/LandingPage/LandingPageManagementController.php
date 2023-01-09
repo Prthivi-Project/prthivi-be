@@ -19,7 +19,7 @@ class LandingPageManagementController extends Controller
 {
     use MediaUpload;
     use MediaRemove;
-    use ResponseFormatter;
+
     /**
      * Display a listing of the resource.
      *
