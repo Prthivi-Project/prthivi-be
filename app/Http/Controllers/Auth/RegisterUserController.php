@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Models\Role;
 use App\Models\User;
 use App\Traits\MediaUpload;
 use Illuminate\Auth\Events\Registered;
@@ -17,11 +18,11 @@ class RegisterUserController extends Controller
 
 
     private $dirName = 'avatar';
-    //
+
     public function register(RegisterRequest $request)
     {
         $payload = $request->safe()->except("password", 'avatar_file', 'avatar_base64');
-        $payload['role_id'] = 4; // customer
+        $payload['role_id'] = Role::$customer; // customer
         $avatar_file = $request->file("avatar_file");
         $avatar_base64 = $request->input("avatar_base64");
 
