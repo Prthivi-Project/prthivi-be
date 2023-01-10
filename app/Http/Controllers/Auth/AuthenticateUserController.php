@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\Api\LoginRequest;
+use App\Services\User\UserService;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,12 @@ use Illuminate\Validation\ValidationException;
 
 class AuthenticateUserController extends Controller
 {
+    private UserService $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->$userService = $userService;
+    }
 
     public function login(LoginRequest $request)
     {
@@ -58,6 +65,7 @@ class AuthenticateUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
+
     public function authenticate(Request $request)
     {
         $this->ensureIsNotRateLimited($request);
