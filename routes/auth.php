@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CreateNewAdminAccountController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticateUserController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\Auth\RegisterUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 
 Route::post('/register', [RegisterUserController::class, "register"])->middleware('guest');
+Route::post('/admin/new-account', [CreateNewAdminAccountController::class, "register"])->middleware('guest');
 Route::post('/login', [AuthenticateUserController::class, "login"])->middleware('guest');
 Route::post('/refresh', [AuthenticateUserController::class, "refresh"])->middleware('jwt.verify');
 Route::post('/logout', [AuthenticateUserController::class, "logout"])->middleware('jwt.verify');

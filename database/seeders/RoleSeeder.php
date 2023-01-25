@@ -27,7 +27,6 @@ class RoleSeeder extends Seeder
         $users = User::all();
         foreach ($users as $key => $user) {
             $i = \rand(0, count($roles) - 1);
-            // $user->roles()->attach($roles[$i]);
             $user->roles()->associate($roles[$i])->save();
         }
     }

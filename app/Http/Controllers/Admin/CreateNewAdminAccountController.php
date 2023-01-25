@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\CreateNewAdminAccountRequest;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Hash;
 
 class CreateNewAdminAccountController extends Controller
 {
-    public function register(Request $request)
+    public function register(CreateNewAdminAccountRequest $request)
     {
 
         $payload = $request->safe()->except("password", 'avatar_file', 'avatar_base64');

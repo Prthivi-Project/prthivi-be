@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CreateSecretKeyController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\LandingPage\LandingPageManagementController;
 use App\Http\Controllers\LandingPage\SectionImageController;
@@ -39,6 +40,9 @@ Route::group(["prefix" => "v1",], function () {
                 ->name("update");
             Route::post("/", [SectionImageController::class, "store"])
                 ->name("store");
+        });
+        Route::prefix("admin")->middleware("jwt.verify")->group(function () {
+            Route::get("/secret-key", [CreateSecretKeyController::class, "create"]);
         });
 
         Route::delete("/{id}", [LandingPageManagementController::class, "destroy"])

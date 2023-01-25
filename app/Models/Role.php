@@ -13,9 +13,16 @@ class Role extends Model
         'role'
     ];
 
+    // helper
+    public static  $admin = 2;
+
+    public static  $vendor = 3;
+
+    public static  $customer  = 4;
+
+
     public function users()
     {
         return $this->hasMany(User::class);
-        // return $this->belongsToMany(User::class, 'user_roles', 'user_id', "role_id");
     }
 }
